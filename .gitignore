@@ -1,0 +1,10 @@
+.vscode/
+<<<<<<< Updated upstream
+**/.DS_Store
+=======
+.DS_Store
+
+*.o
+*.bin
+*.elf
+>>>>>>> Stashed changes
