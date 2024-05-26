@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __USFT_ESSENTIALS_H__
-#define __USFT_ESSENTIALS_H__
+#ifndef __UNIKIT_ESSENTIALS_H__
+#define __UNIKIT_ESSENTIALS_H__
 
 typedef signed   char	s8;
 typedef unsigned char	u8;
@@ -28,4 +28,7 @@ typedef unsigned long	u64;
 #undef __aligned
 #define __aligned(_n) __attribute__((aligned(_n)))
 
-#endif /* __USFT_ESSENTIALS_H__ */
+#undef __used
+#define __used __attribute__((used))
+
+#endif /* __UNIKIT_ESSENTIALS_H__ */

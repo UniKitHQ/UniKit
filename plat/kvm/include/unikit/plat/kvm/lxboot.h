@@ -29,7 +29,7 @@
 
 #ifndef __ASSEMBLY__
 
-#include <usft/essentials.h>
+#include <unikit/essentials.h>
 
 extern struct lxboot_params boot_params;
 extern struct lxboot_setup_header hdr;

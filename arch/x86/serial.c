@@ -4,9 +4,9 @@
  * You may not use this file except in compliance with the License.
  */
 
-#include <common/x86/serial.h>
+#include <unikit/arch/x86/serial.h>
 
-#include <common/x86/asm.h>
+#include <unikit/arch/x86/asm.h>
 
 #define COM1 0x3f8
 
