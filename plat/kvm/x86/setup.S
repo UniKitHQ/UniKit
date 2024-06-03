@@ -12,3 +12,8 @@ setup_32:
 	mov eax, X86_EFER_LME
 	mov ecx, X86_MSR_EFER
 	wrmsr
+
+.section .text.boot.64, "a"
+.code64
+.globl setup_64
+setup_64:
