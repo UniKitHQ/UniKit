@@ -1,9 +1,11 @@
-multiboot.elf: link.x multiboot.S multiboot.c setup.S ../../../arch/x86/serial.c
+multiboot.elf: link.x multiboot.S multiboot.c setup.S ../../../arch/x86/serial.c paging.c pagetable.S
 	zig cc -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -D__ASSEMBLY__ -c multiboot.S -o multiboot.S.o
 	zig cc -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c multiboot.c
+	zig cc -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c paging.c
+	zig cc -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -D__ASSEMBLY__ -c pagetable.S -o pagetable.S.o
 	zig cc -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -D__ASSEMBLY__ -c setup.S -o setup.S.o
 	zig cc -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c ../../../arch/x86/serial.c
-	zig ld.lld -T link.x --entry=_multiboot_entry -o multiboot.elf multiboot.o serial.o multiboot.S.o setup.S.o
+	zig ld.lld -T link.x --entry=_multiboot_entry -o multiboot.elf multiboot.o serial.o multiboot.S.o setup.S.o paging.o pagetable.S.o
 	llvm-objcopy --output-target=elf32-i386 multiboot.elf
 
 .PHONY: run
