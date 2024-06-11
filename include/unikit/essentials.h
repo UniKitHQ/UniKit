@@ -4,8 +4,10 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __UNIKIT_ESSENTIALS_H__
-#define __UNIKIT_ESSENTIALS_H__
+#ifndef __ESSENTIALS_H__
+#define __ESSENTIALS_H__
+
+#ifndef __ASSEMBLY__
 
 typedef signed   char	s8;
 typedef unsigned char	u8;
@@ -19,6 +21,8 @@ typedef unsigned int	u32;
 typedef signed   long	s64;
 typedef unsigned long	u64;
 
+#endif
+
 #undef __packed
 #define __packed __attribute__((packed))
 
@@ -31,4 +35,4 @@ typedef unsigned long	u64;
 #undef __used
 #define __used __attribute__((used))
 
-#endif /* __UNIKIT_ESSENTIALS_H__ */
+#endif /* __ESSENTIALS_H__ */
