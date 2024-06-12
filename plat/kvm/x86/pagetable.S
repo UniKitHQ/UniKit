@@ -1,12 +1,12 @@
 #include <unikit/essentials.h>
 
 #define PTE_4KB     0x0C
-#define PDE         0x03
+#define PDE         0x0C
 #define PDE_2MB     0x15
-#define PDPTE       0x03
+#define PDPTE       0x0C
 #define PDPTE_1GB   0x1E
-#define PML4E       0x03
-#define PML5E       0x03
+#define PML4E       0x0C
+#define PML5E       0x0C
 
 #define X86_PTE_PS   0x080
 
@@ -28,6 +28,10 @@
 	.endr
 .endm
 
+.macro pte_zero cnt
+	.fill \cnt, 0x8, 0
+.endm
+
 #define X86_PTE_PRESENT   0x001
 #define X86_PTE_RW        0x002
 
@@ -35,9 +39,23 @@
  */
 
 .align 0x1000
-pte:
-	pte_fill PDE_2MB, 0x00, X86_PTE_PRESENT | X86_PTE_RW, 0x200
+pd_0:
+	pte_fill PDE_2MB, 0x0000000000000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
+pd_1:
+	pte_fill PDE_2MB, 0x0000000040000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
+pd_2:
+	pte_fill PDE_2MB, 0x0000000080000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
+pd_3:
+	pte_fill PDE_2MB, 0x00000000C0000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
 
 .align 0x1000
-pde:
-	pte PDPTE, pte, X86_PTE_PRESENT | X86_PTE_RW
+pdpt:
+	pte PDPTE, pd_0, X86_PTE_PRESENT | X86_PTE_RW
+	pte PDPTE, pd_1, X86_PTE_PRESENT | X86_PTE_RW
+	pte PDPTE, pd_2, X86_PTE_PRESENT | X86_PTE_RW
+	pte PDPTE, pd_3, X86_PTE_PRESENT | X86_PTE_RW
+	pte_zero 0x200 - 0x04
+
+pml4:
+	pte PML4E, pdpt, X86_PTE_PRESENT | X86_PTE_RW
+	pte_zero 0x200 - 0x01
