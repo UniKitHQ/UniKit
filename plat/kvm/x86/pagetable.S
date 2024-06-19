@@ -39,23 +39,25 @@
  */
 
 .align 0x1000
-pd_0:
+x86_bpt_pd_0:
 	pte_fill PDE_2MB, 0x0000000000000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
-pd_1:
+x86_bpt_pd_1:
 	pte_fill PDE_2MB, 0x0000000040000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
-pd_2:
+x86_bpt_pd_2:
 	pte_fill PDE_2MB, 0x0000000080000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
-pd_3:
+x86_bpt_pd_3:
 	pte_fill PDE_2MB, 0x00000000C0000000, X86_PTE_PRESENT | X86_PTE_RW, 0x200
 
 .align 0x1000
-pdpt:
-	pte PDPTE, pd_0, X86_PTE_PRESENT | X86_PTE_RW
-	pte PDPTE, pd_1, X86_PTE_PRESENT | X86_PTE_RW
-	pte PDPTE, pd_2, X86_PTE_PRESENT | X86_PTE_RW
-	pte PDPTE, pd_3, X86_PTE_PRESENT | X86_PTE_RW
+x86_bpt_pdpt:
+	pte PDPTE, x86_bpt_pd_0, X86_PTE_PRESENT | X86_PTE_RW
+	pte PDPTE, x86_bpt_pd_1, X86_PTE_PRESENT | X86_PTE_RW
+	pte PDPTE, x86_bpt_pd_2, X86_PTE_PRESENT | X86_PTE_RW
+	pte PDPTE, x86_bpt_pd_3, X86_PTE_PRESENT | X86_PTE_RW
 	pte_zero 0x200 - 0x04
 
-pml4:
-	pte PML4E, pdpt, X86_PTE_PRESENT | X86_PTE_RW
+.align 0x1000
+.globl x86_bpt_pml4
+x86_bpt_pml4:
+	pte PML4E, x86_bpt_pdpt, X86_PTE_PRESENT | X86_PTE_RW
 	pte_zero 0x200 - 0x01

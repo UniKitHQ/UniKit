@@ -7,6 +7,18 @@
 #ifndef __ESSENTIALS_H__
 #define __ESSENTIALS_H__
 
+#undef __packed
+#define __packed __attribute__((packed))
+
+#undef __section
+#define __section(_section_name) __attribute__((section(_section_name)))
+
+#undef __aligned
+#define __aligned(_n) __attribute__((aligned(_n)))
+
+#undef __used
+#define __used __attribute__((used))
+
 #ifndef __ASSEMBLY__
 
 typedef signed   char	s8;
@@ -22,17 +34,5 @@ typedef signed   long	s64;
 typedef unsigned long	u64;
 
 #endif
-
-#undef __packed
-#define __packed __attribute__((packed))
-
-#undef __section
-#define __section(_section_name) __attribute__((section(_section_name)))
-
-#undef __aligned
-#define __aligned(_n) __attribute__((aligned(_n)))
-
-#undef __used
-#define __used __attribute__((used))
 
 #endif /* __ESSENTIALS_H__ */
