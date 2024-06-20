@@ -5,7 +5,6 @@
  */
 
 #include <unikit/arch/x86/serial.h>
-
 #include <unikit/arch/x86/asm.h>
 
 #define COM1 0x3f8

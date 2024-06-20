@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ASM_H__
-#define __ASM_H__
+#ifndef __ARCH_X86_ASM_H__
+#define __ARCH_X86_ASM_H__
 
 #include <unikit/essentials.h>
 
@@ -22,4 +22,4 @@ static inline u8 inb(u16 PORT) {
 	return value;
 }
 
-#endif /* __ASM_H__ */
+#endif /* __ARCH_X86_ASM_H__ */

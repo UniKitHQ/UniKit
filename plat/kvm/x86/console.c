@@ -4,12 +4,18 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ARCH_X86_SERIAL_H__
-#define __ARCH_X86_SERIAL_H__
+#include <unikit/arch/x86/serial.h>
 
-void serial_init();
+int kvm_console_init() {
+	serial_init();
+	return 0;
+}
 
-void serial_putc(char i);
-int serial_getc();
+int plat_console_putc(char i) {
+	serial_putc(i);
+	return i;
+}
 
-#endif /* __ARCH_X86_SERIAL_H__ */
+int plat_console_getc() {
+	return serial_getc();
+}

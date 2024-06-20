@@ -7,6 +7,9 @@
 #ifndef __ESSENTIALS_H__
 #define __ESSENTIALS_H__
 
+#undef NULL
+#define NULL __null
+
 #undef __packed
 #define __packed __attribute__((packed))
 

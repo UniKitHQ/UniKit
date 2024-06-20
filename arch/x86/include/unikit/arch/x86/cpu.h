@@ -1,5 +1,11 @@
-#ifndef __CPU_H__
-#define __CPU_H__
+/* SPDX-License-Identifier: Elastic-2.0 */
+/* Copyright (c) 2024, Pribess (Heewon Cho).
+ * Licensed under the Elastic-2.0 License.
+ * You may not use this file except in compliance with the License.
+ */
+
+#ifndef __ARCH_X86_CPU_H__
+#define __ARCH_X86_CPU_H__
 
 /* EFLAGS register */
 #define X86_EFLAGS_CF           (1 <<  0)   /* carry flag                */
@@ -18,7 +24,6 @@
 #define X86_EFLAGS_VIF          (1 << 19)   /* virtual interrupt flag    */
 #define X86_EFLAGS_VIP          (1 << 20)   /* virtual interrupt pending */
 #define X86_EFLAGS_ID           (1 << 21)   /* ID flag                   */
-
 
 /*
  * Basic CPU control in CR0
@@ -81,4 +86,4 @@
 #define X86_EFER_FFXSR		(1 << 14)
 #define X86_EFER_TCE		(1 << 15)
 
-#endif /* __CPU_H__ */
+#endif /* __ARCH_X86_CPU_H__ */

@@ -4,5 +4,10 @@
  * You may not use this file except in compliance with the License.
  */
 
-#include <unikit/essentials.h>
-#include <unikit/arch/x86/paging.h>
+#ifndef __PLAT_CONSOLE_H__
+#define __PLAT_CONSOLE_H__
+
+int plat_console_putc(char i);
+int plat_console_getc();
+
+#endif /* __PLAT_CONSOLE_H__ */

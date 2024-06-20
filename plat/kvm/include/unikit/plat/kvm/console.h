@@ -4,5 +4,9 @@
  * You may not use this file except in compliance with the License.
  */
 
-#include <unikit/essentials.h>
-#include <unikit/arch/x86/paging.h>
+#ifndef __PLAT_KVM_CONSOLE_H__
+#define __PLAT_KVM_CONSOLE_H__
+
+int kvm_console_init();
+
+#endif /* __PLAT_KVM_CONSOLE_H__ */

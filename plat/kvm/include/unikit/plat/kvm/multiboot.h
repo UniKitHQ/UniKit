@@ -19,8 +19,8 @@
  * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __MULTIBOOT_H__
-#define __MULTIBOOT_H__
+#ifndef __PLAT_KVM_MULTIBOOT_H__
+#define __PLAT_KVM_MULTIBOOT_H__
 
 /* How many bytes from the start of the file we search for the header. */
 #define MULTIBOOT_SEARCH			8192
@@ -228,4 +228,4 @@ struct multiboot_apm_info {
 };
 
 #endif /* __ASSEMBLY__ */
-#endif /* __MULTIBOOT_H__ */
+#endif /* __PLAT_KVM_MULTIBOOT_H__ */
