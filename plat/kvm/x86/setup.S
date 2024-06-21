@@ -41,10 +41,19 @@ setup_32:
 	lgdt gdt64_ptr
 
 	.att_syntax
-	ljmp $(gdt64_cs - gdt64), $setup_64
+	ljmp $(gdt64_cs - gdt64), $wrap_up
+
+.code64
+wrap_up:
+	mov $(gdt64_ds - gdt64), %eax
 	.intel_syntax noprefix
 
+	mov eax, es
+	mov eax, ss
+	mov eax, ds
+
+	jmp setup_64
+
 .section .text.boot.64, "a"
-.code64
 .globl setup_64
 setup_64:
