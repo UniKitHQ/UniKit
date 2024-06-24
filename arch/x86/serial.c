@@ -21,12 +21,12 @@
 #define PROT 0x03 /* 8 bits, no parity, one stop bit */
 
 void serial_init() {
-	outb(COM1_INTR, 0x00); /* disable all interrupts */
-	outb(COM1_CTRL, DLAB); /* enable DLAB (set baud rate divisor) */
+	outb(COM1_INTR, 0x00); /* Disable all interrupts */
+	outb(COM1_CTRL, DLAB); /* Enable DLAB (set baud rate divisor) */
 
-	/* set divisor to 3 */
-	outb(COM1_DIV_LO, 0x01); /* low */
-	outb(COM1_DIV_HI, 0x00); /* high */
+	/* Set divisor to 3 */
+	outb(COM1_DIV_LO, 0x01); /* LOW */
+	outb(COM1_DIV_HI, 0x00); /* HIGH */
 
 	outb(COM1_CTRL, PROT);
 }

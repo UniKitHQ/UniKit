@@ -32,12 +32,14 @@ setup_32:
 	mov ecx, X86_MSR_EFER
 	wrmsr
 
+	/* Set up boot page tables */
 	mov eax, x86_bpt_pml4
 	mov cr3, eax
 
 	mov eax, X86_CR0_PE | X86_CR0_WP | X86_CR0_PG
 	mov cr0, eax
 
+	/* Load GDT and jump to 64-bit code segment */
 	lgdt gdt64_ptr
 
 	.att_syntax
@@ -48,12 +50,26 @@ wrap_up:
 	mov $(gdt64_ds - gdt64), %eax
 	.intel_syntax noprefix
 
-	mov eax, es
-	mov eax, ss
-	mov eax, ds
+	mov es, eax
+	mov ss, eax
+	mov ds, eax
 
 	jmp setup_64
 
 .section .text.boot.64, "a"
 .globl setup_64
 setup_64:
+	/* Enable FPU */
+	mov eax, cr0
+	or eax, X86_CR0_NE | X86_CR0_MP
+	and eax, ~(X86_CR0_EM | X86_CR0_TS)
+	mov cr0, eax
+	fninit
+
+	/* Enable SSE */
+	mov eax, cr0
+	or eax, X86_CR4_OSFXSR | X86_CR4_OSXMMEXCPT
+	mov cr4, eax
+
+	call x86_setup
+	hlt

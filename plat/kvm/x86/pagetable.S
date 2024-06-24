@@ -41,7 +41,8 @@
 #define X86_PTE_PRESENT   0x001
 #define X86_PTE_RW        0x002
 
-/* boot page table
+/* 
+ * Boot Page Table
  */
 
 .align 0x1000

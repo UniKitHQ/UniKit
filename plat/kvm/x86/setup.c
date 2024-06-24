@@ -5,4 +5,9 @@
  */
 
 #include <unikit/essentials.h>
-#include <unikit/arch/x86/paging.h>
+
+#include <unikit/plat/console.h>
+
+void x86_setup() {
+	
+}
