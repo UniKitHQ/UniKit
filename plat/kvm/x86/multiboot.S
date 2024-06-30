@@ -6,6 +6,11 @@
 
 #include <unikit/plat/kvm/multiboot.h>
 
+.section .data.boot, "a"
+.globl boot_entry
+boot_entry:
+	.quad multiboot_entry
+
 .section .text.boot, "a"
 .code32
 .globl _multiboot_entry
@@ -14,7 +19,7 @@ _multiboot_entry:
 
 	jne magic_mismatch
 
-	call setup_32
+	call boot_32
 
 magic_mismatch:
 	cli

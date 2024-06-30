@@ -21,8 +21,8 @@ gdt64_ptr:
 
 .section .text.boot.32, "a"
 .code32
-.globl setup_32
-setup_32:
+.globl boot_32
+boot_32:
 	/* Enable physical address extension (PAE) */
 	mov eax, X86_CR4_PAE
 	mov cr4, eax
@@ -54,22 +54,22 @@ wrap_up:
 	mov ss, eax
 	mov ds, eax
 
-	jmp setup_64
+	jmp boot_64
 
 .section .text.boot.64, "a"
-.globl setup_64
-setup_64:
+.globl boot_64
+boot_64:
 	/* Enable FPU */
-	mov eax, cr0
-	or eax, X86_CR0_NE | X86_CR0_MP
-	and eax, ~(X86_CR0_EM | X86_CR0_TS)
-	mov cr0, eax
+	mov rax, cr0
+	or rax, X86_CR0_NE | X86_CR0_MP
+	and rax, ~(X86_CR0_EM | X86_CR0_TS)
+	mov cr0, rax
 	fninit
 
 	/* Enable SSE */
-	mov eax, cr0
-	or eax, X86_CR4_OSFXSR | X86_CR4_OSXMMEXCPT
-	mov cr4, eax
+	mov rax, cr0
+	or rax, X86_CR4_OSFXSR | X86_CR4_OSXMMEXCPT
+	mov cr4, rax
 
-	call x86_setup
+	call [boot_entry]
 	hlt

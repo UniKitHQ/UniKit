@@ -15,3 +15,7 @@ struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
 	.flags = MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO,
 	.checksum = -(MULTIBOOT_HEADER_MAGIC + (MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO)),
 };
+
+void multiboot_entry() {
+	
+}
