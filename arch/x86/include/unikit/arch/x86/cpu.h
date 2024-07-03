@@ -57,7 +57,10 @@
 #define X86_XCR0_X87            (1 << 0)
 #define X86_XCR0_SSE            (1 << 1)
 #define X86_XCR0_AVX            (1 << 2)
-#define X86_XCR0_PKRU		(1 << 9)
+#define X86_XCR0_OPMASK         (1 << 5)
+#define X86_XCR0_ZMM_HI256      (1 << 6)
+#define X86_XCR0_HI16_ZMM       (1 << 7)
+#define X86_XCR0_PKRU           (1 << 9)
 
 /*
  * Model-specific register addresses

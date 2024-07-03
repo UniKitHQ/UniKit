@@ -4,6 +4,19 @@
  * You may not use this file except in compliance with the License.
  */
 
+/*
+ * ┌───────────────────────┐   ┌─────────────────┐
+ * │   multiboot.S         │   │   boot.S        │
+ * │   _multiboot_entry:   ├──►│   boot_32:      │
+ * └───────────────────────┘   │   boot_64:      │
+ *                             └────────┬────────┘
+ *                                      │         
+ *      ┌────────────────────────────┐  │         
+ *      │   multiboot.c              │◄─┘         
+ *      │   void multiboot_entry()   │            
+ *      └────────────────────────────┘            
+ */
+
 #include <unikit/plat/kvm/multiboot.h>
 
 .section .data.boot, "a"

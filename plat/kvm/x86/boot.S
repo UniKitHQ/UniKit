@@ -61,8 +61,8 @@ wrap_up:
 boot_64:
 	/* Enable FPU */
 	mov rax, cr0
-	or rax, X86_CR0_NE | X86_CR0_MP
 	and rax, ~(X86_CR0_EM | X86_CR0_TS)
+	or rax, X86_CR0_NE | X86_CR0_MP
 	mov cr0, rax
 	fninit
 
@@ -70,6 +70,16 @@ boot_64:
 	mov rax, cr0
 	or rax, X86_CR4_OSFXSR | X86_CR4_OSXMMEXCPT
 	mov cr4, rax
+
+	/* Enable OSXSAVE */
+	mov rax, cr4
+	or rax, X86_CR4_OSXSAVE
+	mov cr4, rax
+
+	/* Enable AVX and AVX-512 */
+	xor rcx, rcx
+	xgetbv
+	or rax, (X86_XCR0_X87 | X86_XCR0_SSE | X86_XCR0_AVX | X86_XCR0_OPMASK | X86_XCR0_ZMM_HI256 | X86_XCR0_HI16_ZMM)
 
 	call [boot_entry]
 	hlt
