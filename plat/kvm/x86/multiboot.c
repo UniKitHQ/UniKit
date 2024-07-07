@@ -4,6 +4,7 @@
  * You may not use this file except in compliance with the License.
  */
 
+#include "unikit/arch/x86/serial.h"
 #include <unikit/essentials.h>
 #include <unikit/plat/kvm/multiboot.h>
 
@@ -16,6 +17,5 @@ struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
 	.checksum = -(MULTIBOOT_HEADER_MAGIC + (MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO)),
 };
 
-void multiboot_entry() {
-	
+void multiboot_entry(struct multiboot_info *mi) {
 }

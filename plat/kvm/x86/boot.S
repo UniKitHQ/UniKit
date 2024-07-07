@@ -7,7 +7,21 @@
 #include <unikit/arch/x86/cpu.h>
 #include <unikit/arch/x86/gdt.h>
 
-.section .data.boot.32, "a"
+/**
+ * 32-bit boot entry function
+ * @param edi       Address of the protocol dependent boot function
+ * @param esi       Address of the boot stack
+ * @param edx       Address of the boot information structure
+ *
+ * Prerequisite:
+ * - 32-bit protected mode
+ * - Paging disabled
+ * - A20 gate enabled
+ * - GDT with descriptor for 4GB flat CS and DS segments (must have R/E, R/W permissions)
+ * - Interrupts disabled
+ */
+
+.section .data.boot.32
 gdt64:
 gdt64_null:
 	.quad 0x0000000000000000 /* null segment */
@@ -19,7 +33,7 @@ gdt64_ptr:
 	.word gdt64_ptr - gdt64 - 1
 	.quad gdt64
 
-.section .text.boot.32, "a"
+.section .text.boot.32
 .code32
 .globl boot_32
 boot_32:
@@ -56,30 +70,78 @@ wrap_up:
 
 	jmp boot_64
 
-.section .text.boot.64, "a"
+/*
+ * 64-bit boot entry function
+ * @param rdi       Address of the protocol dependent boot function
+ * @param rsi       Address of the boot stack
+ * @param rdx       Address of the boot information structure
+ *
+ * Prerequisite:
+ * - 64-bit long mode
+ * - Paging enabled with identity mapped paging
+ * - GDT with descriptor for flat CS and DS segments (must have R/E, R/W permissions)
+ * - Interrupts disabled
+ */
+
+.section .text.boot.64
 .globl boot_64
 boot_64:
+    mov rsp, rsi /* Set up boot stack */
+
+    push rdx
+
+    mov rax, 0x1
+    cpuid
+
+.macro if_available feature, register, label
+	test \register, \feature
+	jz \label
+.endmacro
+
 	/* Enable FPU */
+	if_available X86_CPUID_1_EDX_FPU, rdx, no_fpu
 	mov rax, cr0
 	and rax, ~(X86_CR0_EM | X86_CR0_TS)
 	or rax, X86_CR0_NE | X86_CR0_MP
 	mov cr0, rax
 	fninit
+no_fpu:
 
 	/* Enable SSE */
+	if_available X86_CPUID_1_EDX_SSE, rdx, no_sse
 	mov rax, cr0
 	or rax, X86_CR4_OSFXSR | X86_CR4_OSXMMEXCPT
 	mov cr4, rax
+no_sse:
 
 	/* Enable OSXSAVE */
+	if_available X86_CPUID_1_ECX_OSXSAVE, rcx, no_osxsave
 	mov rax, cr4
 	or rax, X86_CR4_OSXSAVE
 	mov cr4, rax
+no_osxsave:
 
 	/* Enable AVX and AVX-512 */
+	if_available X86_CPUID_1_ECX_AVX, rcx, no_avx
 	xor rcx, rcx
 	xgetbv
-	or rax, (X86_XCR0_X87 | X86_XCR0_SSE | X86_XCR0_AVX | X86_XCR0_OPMASK | X86_XCR0_ZMM_HI256 | X86_XCR0_HI16_ZMM)
+	or rax, (X86_XCR0_X87 | X86_XCR0_SSE | X86_XCR0_AVX)
 
-	call [boot_entry]
+	if_available X86_CPUID_7_EBX_AVX512F, rbx, no_avx512
+	or rax, (X86_XCR0_OPMASK | X86_XCR0_ZMM_HI256 | X86_XCR0_HI16_ZMM)
+
+no_avx512:
+	xsetbv
+no_avx:
+
+	pop rdx
+
+	mov rax, rdi
+	mov rdi, rdx /* Pass boot information structure to function */
+	call rax
+
+fail:
+    cli
+1:
 	hlt
+	jmp 1b

@@ -67,26 +67,38 @@
  */
 #define X86_MSR_FS_BASE         0xc0000100
 /* extended feature register */
-#define X86_MSR_EFER		0xc0000080
+#define X86_MSR_EFER            0xc0000080
 /* legacy mode SYSCALL target */
-#define X86_MSR_STAR		0xc0000081
+#define X86_MSR_STAR            0xc0000081
 /* long mode SYSCALL target */
-#define X86_MSR_LSTAR		0xc0000082
+#define X86_MSR_LSTAR           0xc0000082
 /* compat mode SYSCALL target */
-#define X86_MSR_CSTAR		0xc0000083
+#define X86_MSR_CSTAR           0xc0000083
 /* EFLAGS mask for syscall */
-#define X86_MSR_SYSCALL_MASK	0xc0000084
+#define X86_MSR_SYSCALL_MASK    0xc0000084
 /* page attribute table configuration */
-#define X86_MSR_PAT		0x277
+#define X86_MSR_PAT             0x277
 
 /* MSR EFER bits */
-#define X86_EFER_SCE		(1 << 0)
-#define X86_EFER_LME		(1 << 8)
-#define X86_EFER_LMA		(1 << 10)
-#define X86_EFER_NXE		(1 << 11)
-#define X86_EFER_SVME		(1 << 12)
-#define X86_EFER_LMSLE		(1 << 13)
-#define X86_EFER_FFXSR		(1 << 14)
-#define X86_EFER_TCE		(1 << 15)
+#define X86_EFER_SCE            (1 << 0)
+#define X86_EFER_LME            (1 << 8)
+#define X86_EFER_LMA            (1 << 10)
+#define X86_EFER_NXE            (1 << 11)
+#define X86_EFER_SVME           (1 << 12)
+#define X86_EFER_LMSLE          (1 << 13)
+#define X86_EFER_FFXSR          (1 << 14)
+#define X86_EFER_TCE            (1 << 15)
+
+#define X86_CPUID_1_ECX_X2APIC  (1 << 21)
+#define X86_CPUID_1_ECX_XSAVE   (1 << 26)
+#define X86_CPUID_1_ECX_OSXSAVE (1 << 27)
+#define X86_CPUID_1_ECX_AVX     (1 << 28)
+#define X86_CPUID_1_ECX_RDRAND  (1 << 30)
+#define X86_CPUID_1_EDX_FPU     (1 << 0)
+#define X86_CPUID_1_EDX_PAT     (1 << 16)
+#define X86_CPUID_1_EDX_FXSR    (1 << 24)
+#define X86_CPUID_1_EDX_SSE     (1 << 25)
+
+#define X86_CPUID_7_EBX_AVX512F (1 << 16)
 
 #endif /* __ARCH_X86_CPU_H__ */

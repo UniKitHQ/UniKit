@@ -10,21 +10,29 @@
  * │   _multiboot_entry:   ├──►│   boot_32:      │
  * └───────────────────────┘   │   boot_64:      │
  *                             └────────┬────────┘
- *                                      │         
- *      ┌────────────────────────────┐  │         
- *      │   multiboot.c              │◄─┘         
- *      │   void multiboot_entry()   │            
- *      └────────────────────────────┘            
+ *                                      │
+ *      ┌────────────────────────────┐  │
+ *      │   multiboot.c              │◄─┘
+ *      │   void multiboot_entry()   │
+ *      └────────────────────────────┘
  */
 
 #include <unikit/plat/kvm/multiboot.h>
 
-.section .data.boot, "a"
-.globl boot_entry
-boot_entry:
-	.quad multiboot_entry
+.section .bss
+.space 4096
+boot_stack:
 
-.section .text.boot, "a"
+/*
+ * 32-bit multiboot entry function
+ * EAX = multiboot bootloader magic
+ * EBX = 32-bit physical address of multiboot info structure
+ * GDT with descriptor for 4GB flat CS and DS segments
+ * Interrupts are disabled
+ * DS = ES = FS = GS = SS = 0x10
+ */
+
+.section .text.boot
 .code32
 .globl _multiboot_entry
 _multiboot_entry:
@@ -32,10 +40,11 @@ _multiboot_entry:
 
 	jne magic_mismatch
 
+	lea edi, multiboot_entry /* Boot function address */
+	lea esi, boot_stack      /* Boot stack address */
+	mov edx, ebx             /* Multiboot information structure */
 	call boot_32
 
 magic_mismatch:
-	cli
-1:
 	hlt
-	jmp	1b
+	jmp	magic_mismatch

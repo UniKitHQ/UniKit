@@ -1,4 +1,5 @@
 .vscode
+.clangd
 .cache
 .DS_Store
 zig-cache
