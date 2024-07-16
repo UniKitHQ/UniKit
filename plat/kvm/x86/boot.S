@@ -13,7 +13,7 @@
  * @param esi       Address of the boot stack
  * @param edx       Address of the boot information structure
  *
- * Prerequisite:
+ * Assume that:
  * - 32-bit protected mode
  * - Paging disabled
  * - A20 gate enabled
@@ -76,7 +76,7 @@ wrap_up:
  * @param rsi       Address of the boot stack
  * @param rdx       Address of the boot information structure
  *
- * Prerequisite:
+ * Assume that
  * - 64-bit long mode
  * - Paging enabled with identity mapped paging
  * - GDT with descriptor for flat CS and DS segments (must have R/E, R/W permissions)
@@ -137,7 +137,7 @@ no_avx:
 	pop rdx
 
 	mov rax, rdi
-	mov rdi, rdx /* Pass boot information structure to function */
+	mov rdi, rdx /* Pass boot information structure as an argument */
 	call rax
 
 fail:
