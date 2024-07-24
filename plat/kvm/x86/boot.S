@@ -47,7 +47,7 @@ boot_32:
 	wrmsr
 
 	/* Set up boot page tables */
-	mov eax, x86_bpt_pml4
+	mov eax, offset x86_bpt_pml4
 	mov cr3, eax
 
 	mov eax, X86_CR0_PE | X86_CR0_WP | X86_CR0_PG

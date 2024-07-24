@@ -40,9 +40,9 @@ _multiboot_entry:
 
 	jne magic_mismatch
 
-	lea edi, multiboot_entry /* Boot function address */
-	lea esi, boot_stack      /* Boot stack address */
-	mov edx, ebx             /* Multiboot information structure */
+	mov edi, offset multiboot_entry /* Boot function address */
+	mov esi, offset boot_stack      /* Boot stack address */
+	mov edx, ebx                    /* Multiboot information structure */
 	call boot_32
 
 magic_mismatch:
