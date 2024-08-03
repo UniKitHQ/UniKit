@@ -4,6 +4,7 @@
  * You may not use this file except in compliance with the License.
  */
 
+#include <unikit/plat/console.h>
 #include <unikit/arch/x86/serial.h>
 
 int kvm_console_init() {
@@ -11,11 +12,16 @@ int kvm_console_init() {
 	return 0;
 }
 
-int plat_console_putc(char i) {
-	serial_putc(i);
-	return i;
+int plat_puts(const char *str, sz len) {
+	for (int i = 0 ; i < len ; i++) {
+		serial_putc(str[i]);
+	}
+	return len;
 }
 
-int plat_console_getc() {
-	return serial_getc();
+int plat_gets(char *buf, sz len) {
+	for (int i = 0 ; i < len ; i++) {
+			buf[i] = serial_getc();
+	}
+	return len;
 }
