@@ -10,18 +10,18 @@
 #include <unikit/essentials.h>
 
 struct unikit_bootinfo {
-	/* Boot info magic */
+	/** Boot info magic */
 	#define BOOTINFO_MAGIC 0xB0071EF0
 	u32 magic;
 
-	/* Boot environment identifier */
+	/** Boot loader identifier */
 	u8 *bootloader;
+	/** Boot protocol identifier */
 	u8 *protocol;
 
-	/* Null-terminated kernel command line */
+	/** Boot command line */
 	u8 *cmdline;
 };
-
 
 struct unikit_bootinfo *get_bootinfo();
 void set_bootinfo(struct unikit_bootinfo new_bi);
