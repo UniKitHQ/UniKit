@@ -20,8 +20,16 @@ struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
 
 void multiboot_entry(struct multiboot_info *mi) {
 	struct unikit_bootinfo bi = {
-		.magic = BOOTINFO_MAGIC
+		.magic = BOOTINFO_MAGIC, 0x00
 	};
+
+	bi.protocol = (u8 *)"multiboot";
+
+	if (mi->flags & MULTIBOOT_INFO_BOOT_LOADER_NAME) {
+		if (mi->boot_loader_name) {
+			bi.bootloader = (u8 *)(u64)mi->boot_loader_name;
+		}
+	}
 
 	if (mi->flags & MULTIBOOT_INFO_CMDLINE) {
 		if (mi->cmdline) {
