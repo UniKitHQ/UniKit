@@ -35,5 +35,5 @@ void multiboot_entry(struct multiboot_info *mi) {
 		}
 	}
 
-	set_bootinfo(bi);
+	unikit_set_bootinfo(bi);
 }

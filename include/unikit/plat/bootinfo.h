@@ -27,12 +27,12 @@ struct unikit_bootinfo {
  * Gets the boot information structure
  * @return Address of boot information structure
  */
-struct unikit_bootinfo *get_bootinfo();
+struct unikit_bootinfo *unikit_get_bootinfo();
 
 /**
  * Sets the boot information structure
  * @param new_bi Boot information structure to set
  */
-void set_bootinfo(struct unikit_bootinfo new_bi);
+void unikit_set_bootinfo(struct unikit_bootinfo new_bi);
 
 #endif /* __PLAT_BOOTINFO_H__ */

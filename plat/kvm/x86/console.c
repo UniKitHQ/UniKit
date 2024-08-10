@@ -12,15 +12,15 @@ int kvm_console_init() {
 	return 0;
 }
 
-int plat_puts(const char *str, sz len) {
-	for (int i = 0 ; i < len ; i++) {
+int unikit_puts(const char *str, sz len) {
+	for (int i = 0; i < len; i++) {
 		serial_putc(str[i]);
 	}
 	return len;
 }
 
-int plat_gets(char *buf, sz len) {
-	for (int i = 0 ; i < len ; i++) {
+int unikit_gets(char *buf, sz len) {
+	for (int i = 0; i < len; i++) {
 			buf[i] = serial_getc();
 	}
 	return len;

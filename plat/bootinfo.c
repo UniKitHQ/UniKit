@@ -9,11 +9,11 @@
 
 static struct unikit_bootinfo bi;
 
-struct unikit_bootinfo *get_bootinfo() {
+struct unikit_bootinfo *unikit_get_bootinfo() {
 	if (unlikely(bi.magic != BOOTINFO_MAGIC)) return NULL;
 	return &bi;
 }
 
-void set_bootinfo(struct unikit_bootinfo new_bi) {
+void unikit_set_bootinfo(struct unikit_bootinfo new_bi) {
 	bi = new_bi;
 }
