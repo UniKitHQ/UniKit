@@ -4,7 +4,6 @@
  * You may not use this file except in compliance with the License.
  */
 
-#include "unikit/arch/x86/serial.h"
 #include <unikit/essentials.h>
 #include <unikit/plat/kvm/multiboot.h>
 #include <unikit/plat/bootinfo.h>
@@ -19,9 +18,8 @@ struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
 };
 
 void multiboot_entry(struct multiboot_info *mi) {
-	struct unikit_bootinfo bi = {
-		.magic = BOOTINFO_MAGIC, 0x00
-	};
+	struct unikit_bootinfo bi = { 0x00 };
+	bi.magic = BOOTINFO_MAGIC;
 
 	bi.protocol = (u8 *)"multiboot";
 
