@@ -29,10 +29,12 @@
 #define unlikely(x) (__builtin_expect((!!(x)), 0))
 
 #undef STRINGFY
-#define STRINGIFY(x) #x
+#define __STRINGIFY(x) #x
+#define STRINGIFY(x) __STRINGIFY(x)
 
 #undef CONCAT
-#define CONCAT(x, y) x##y
+#define __CONCAT(x, y) x##y
+#define CONCAT(x, y) __CONCAT(x, y)
 
 #ifndef __ASSEMBLY__
 

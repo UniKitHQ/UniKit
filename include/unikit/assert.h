@@ -10,28 +10,20 @@
 #include <unikit/essentials.h>
 #include <unikit/plat/console.h>
 
+#define PRINT(x) unikit_puts(x, sizeof(x) - 1)
+
+/* TODO: termination */
 #undef ASSERT
-#define ASSERT(x)                                  \
-	do {                                           \
-		if (unlikely(!(x))) {                      \
-			plat_puts("Assertion failed: ",        \
-			 sizeof("Assertion failed: ") - 1);    \
-			plat_puts(STRINGIFY(x),                \
-			 sizeof(STRINGIFY(x)) - 1);            \
-			/* TODO: stacktrace and termination */ \
-		}                                          \
+#define ASSERT(x)                                              \
+	do {                                                       \
+		if (unlikely(!(x))) {                                  \
+			PRINT(__FILE__ ":");                               \
+			PRINT(STRINGIFY(__LINE__) ": ");                   \
+			PRINT("assertion \"" STRINGIFY(x) "\" failed.\n"); \
+			PRINT("in function \"");                           \
+			PRINT(__PRETTY_FUNCTION__);                        \
+			PRINT("\"\n");                                     \
+		}                                                      \
 	} while (0)
-
-#define WARNIF(x)                                \
-	do {                                         \
-		if (unlikely(x)) {                       \
-			plat_puts("Condition warning: ",     \
-			 sizeof("Condition warning: ") - 1); \
-			plat_puts(STRINGIFY(x),              \
-			 sizeof(STRINGIFY(x)) - 1);          \
-			/* TODO: stacktrace */               \
-		}                                        \
-	} while (0)
-
 
 #endif /* __ASSERT_H__ */
