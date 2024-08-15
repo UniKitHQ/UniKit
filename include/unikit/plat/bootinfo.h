@@ -8,6 +8,7 @@
 #define __PLAT_BOOTINFO_H__
 
 #include <unikit/essentials.h>
+#include <unikit/plat/memory.h>
 
 struct unikit_bootinfo {
 	/** Boot info magic */
@@ -21,6 +22,9 @@ struct unikit_bootinfo {
 
 	/** Boot command line */
 	u8 *cmdline;
+
+	/** Memory map */
+	struct unikit_memory_map mmap;
 };
 
 /**
