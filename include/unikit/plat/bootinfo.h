@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __PLAT_BOOTINFO_H__
-#define __PLAT_BOOTINFO_H__
+#ifndef __UNIKIT_PLAT_BOOTINFO_H__
+#define __UNIKIT_PLAT_BOOTINFO_H__
 
 #include <unikit/essentials.h>
 #include <unikit/plat/memory.h>
@@ -39,4 +39,4 @@ struct unikit_bootinfo *unikit_get_bootinfo();
  */
 void unikit_set_bootinfo(struct unikit_bootinfo new_bi);
 
-#endif /* __PLAT_BOOTINFO_H__ */
+#endif /* __UNIKIT_PLAT_BOOTINFO_H__ */

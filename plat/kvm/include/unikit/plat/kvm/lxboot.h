@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __PLAT_KVM_LXBOOT_H__
-#define __PLAT_KVM_LXBOOT_H__
+#ifndef __UNIKIT_PLAT_KVM_LXBOOT_H__
+#define __UNIKIT_PLAT_KVM_LXBOOT_H__
 
 #define ROOT_RDONLY 1
 
@@ -329,4 +329,4 @@ struct lxboot_params {
 
 #endif /* __ASSEMBLY__ */
 
-#endif /* __PLAT_KVM_LXBOOT_H__ */
+#endif /* __UNIKIT_PLAT_KVM_LXBOOT_H__ */

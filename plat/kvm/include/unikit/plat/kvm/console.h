@@ -4,9 +4,9 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __PLAT_KVM_CONSOLE_H__
-#define __PLAT_KVM_CONSOLE_H__
+#ifndef __UNIKIT_PLAT_KVM_CONSOLE_H__
+#define __UNIKIT_PLAT_KVM_CONSOLE_H__
 
 int kvm_console_init();
 
-#endif /* __PLAT_KVM_CONSOLE_H__ */
+#endif /* __UNIKIT_PLAT_KVM_CONSOLE_H__ */

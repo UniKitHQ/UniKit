@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ERRNO_H__
-#define __ERRNO_H__
+#ifndef __UNIKIT_ERRNO_H__
+#define __UNIKIT_ERRNO_H__
 
 #define EPERM            1         /** Operation not permitted */
 #define ENOENT           2         /** No such file or directory */
@@ -142,4 +142,4 @@
 #define ERFKILL         132        /** Operation not possible due to RF-kill */
 #define EHWPOISON       133        /** Memory page has hardware error */
 
-#endif /* __ERRNO_H__ */
+#endif /* __UNIKIT_ERRNO_H__ */

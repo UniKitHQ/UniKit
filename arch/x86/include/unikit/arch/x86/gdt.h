@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ARCH_X86_GDT_H__
-#define __ARCH_X86_GDT_H__
+#ifndef __UNIKIT_ARCH_X86_GDT_H__
+#define __UNIKIT_ARCH_X86_GDT_H__
 
 #include <unikit/essentials.h>
 
@@ -65,4 +65,4 @@ static inline void gdtr(u64 gdtr) {
 
 #endif
 
-#endif /* __ARCH_X86_GDT_H__ */
+#endif /* __UNIKIT_ARCH_X86_GDT_H__ */

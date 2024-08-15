@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __PLAT_CONSOLE_H__
-#define __PLAT_CONSOLE_H__
+#ifndef __UNIKIT_PLAT_CONSOLE_H__
+#define __UNIKIT_PLAT_CONSOLE_H__
 
 #include <unikit/essentials.h>
 
@@ -25,4 +25,4 @@ int unikit_puts(const char *str, sz len);
  */
 int unikit_gets(char *buf, sz len);
 
-#endif /* __PLAT_CONSOLE_H__ */
+#endif /* __UNIKIT_PLAT_CONSOLE_H__ */

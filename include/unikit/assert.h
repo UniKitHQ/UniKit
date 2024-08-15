@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ASSERT_H__
-#define __ASSERT_H__
+#ifndef __UNIKIT_ASSERT_H__
+#define __UNIKIT_ASSERT_H__
 
 #include <unikit/essentials.h>
 #include <unikit/plat/console.h>
@@ -26,4 +26,4 @@
 		}                                                      \
 	} while (0)
 
-#endif /* __ASSERT_H__ */
+#endif /* __UNIKIT_ASSERT_H__ */

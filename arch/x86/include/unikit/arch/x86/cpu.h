@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ARCH_X86_CPU_H__
-#define __ARCH_X86_CPU_H__
+#ifndef __UNIKIT_ARCH_X86_CPU_H__
+#define __UNIKIT_ARCH_X86_CPU_H__
 
 /* EFLAGS register */
 #define X86_EFLAGS_CF           (1 <<  0)   /* carry flag                */
@@ -101,4 +101,4 @@
 
 #define X86_CPUID_7_EBX_AVX512F (1 << 16)
 
-#endif /* __ARCH_X86_CPU_H__ */
+#endif /* __UNIKIT_ARCH_X86_CPU_H__ */

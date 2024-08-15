@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ARCH_X86_PAGING_H__
-#define __ARCH_X86_PAGING_H__
+#ifndef __UNIKIT_ARCH_X86_PAGING_H__
+#define __UNIKIT_ARCH_X86_PAGING_H__
 
 #include <unikit/essentials.h>
 
@@ -127,4 +127,4 @@ struct x86_pte_4kb {
 	u64 xd            : 1;
 };
 
-#endif /* __ARCH_X86_PAGING_H__ */
+#endif /* __UNIKIT_ARCH_X86_PAGING_H__ */

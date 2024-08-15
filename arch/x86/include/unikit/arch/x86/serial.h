@@ -4,12 +4,12 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ARCH_X86_SERIAL_H__
-#define __ARCH_X86_SERIAL_H__
+#ifndef __UNIKIT_ARCH_X86_SERIAL_H__
+#define __UNIKIT_ARCH_X86_SERIAL_H__
 
 void serial_init();
 
 void serial_putc(char i);
 int serial_getc();
 
-#endif /* __ARCH_X86_SERIAL_H__ */
+#endif /* __UNIKIT_ARCH_X86_SERIAL_H__ */

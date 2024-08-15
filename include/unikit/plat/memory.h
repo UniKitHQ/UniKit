@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __PLAT_MEMORY_H__
-#define __PLAT_MEMORY_H__
+#ifndef __UNIKIT_PLAT_MEMORY_H__
+#define __UNIKIT_PLAT_MEMORY_H__
 
 #include <unikit/essentials.h>
 #include <stddef.h>
@@ -34,4 +34,4 @@ struct unikit_memory_map {
 
 void unikit_memory_map_insert(struct unikit_memory_desc md);
 
-#endif /* __PLAT_MEMORY_H__ */
+#endif /* __UNIKIT_PLAT_MEMORY_H__ */

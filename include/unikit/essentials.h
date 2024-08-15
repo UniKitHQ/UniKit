@@ -4,8 +4,8 @@
  * You may not use this file except in compliance with the License.
  */
 
-#ifndef __ESSENTIALS_H__
-#define __ESSENTIALS_H__
+#ifndef __UNIKIT_ESSENTIALS_H__
+#define __UNIKIT_ESSENTIALS_H__
 
 #undef NULL
 #define NULL ((void *)0)
@@ -54,4 +54,4 @@ typedef u64 sz;
 
 #endif
 
-#endif /* __ESSENTIALS_H__ */
+#endif /* __UNIKIT_ESSENTIALS_H__ */
