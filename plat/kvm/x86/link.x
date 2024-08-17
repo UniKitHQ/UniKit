@@ -37,7 +37,7 @@ SECTIONS {
 	{
 	    *(.bss)
 	    *(.bss.*)
-	} :data
+	}
 
 	.data :
 	{
