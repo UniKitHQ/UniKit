@@ -14,17 +14,7 @@ void *memcpy(void *dst, const void *src, sz len) {
 	return dst;
 }
 
-void *memset(void *dst, int value, sz len) {
-	void *ptr = dst;
-
-	while (len-- > 0)
-		*((u8 *)ptr++) = (u8)value;
-
-	return dst;
-}
-
 void *memmove(void *dst, const void *src, sz len) {
-
 	void *d = dst;
 	const void *s = src;
 
@@ -39,6 +29,15 @@ void *memmove(void *dst, const void *src, sz len) {
 		while (len-- > 0)
 			*((u8 *)d--) = *((u8 *)s--);
 	}
+
+	return dst;
+}
+
+void *memset(void *dst, int value, sz len) {
+	void *ptr = dst;
+
+	while (len-- > 0)
+		*((u8 *)ptr++) = (u8)value;
 
 	return dst;
 }
