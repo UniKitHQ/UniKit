@@ -1,4 +1,4 @@
-multiboot.elf: link.x multiboot.S multiboot.c boot.S ../../../arch/x86/serial.c pagetable.S console.c ../../bootinfo.c ../../nostd.c
+multiboot.elf: link.x multiboot.S multiboot.c boot.S ../../../arch/x86/serial.c pagetable.S console.c ../../bootinfo.c ../../memory.c ../../nostd.c
 	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -D__ASSEMBLY__ -c multiboot.S -o multiboot.S.o
 	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c multiboot.c
 	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -D__ASSEMBLY__ -c pagetable.S -o pagetable.S.o
@@ -8,7 +8,8 @@ multiboot.elf: link.x multiboot.S multiboot.c boot.S ../../../arch/x86/serial.c 
 	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c multiboot.c
 	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c ../../bootinfo.c
 	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c ../../nostd.c
-	ld.lld -T link.x --entry=_multiboot_entry -o multiboot.elf multiboot.o serial.o multiboot.S.o boot.S.o pagetable.S.o console.o bootinfo.o nostd.o
+	clang -I../include -I../../../include -I../../../arch/x86/include -masm=intel -target x86_64-freestanding -c ../../memory.c
+	ld.lld -T link.x --entry=_multiboot_entry -o multiboot.elf multiboot.o serial.o multiboot.S.o boot.S.o pagetable.S.o console.o bootinfo.o memory.o nostd.o
 	llvm-objcopy --output-target=elf32-i386 multiboot.elf
 
 .PHONY: run
