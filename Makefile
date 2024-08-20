@@ -1,14 +1,21 @@
 .DEFAULT_GOAL := default
 .PHONY: default
 default:
-	@echo "No target platform specified. Please specify a target platform."
+	$(error No target platform specified. Please specify a target platform.)
 
 ARCH ?= $(shell uname -m)
 
 ifeq ($(ARCH), x86_64)
 	ARCH_DIR = x86
 else
-	ARCH_DIR = $(ARCH)
+	ARCH_DIR = null
+endif
+
+ifeq ($(ARCH_DIR), null)
+.PHONY: check_arch
+check_arch:
+	$(error Unsupported architecture: $(ARCH))
+$(MAKECMDGOALS): check_arch
 endif
 
 ifeq ($(MAKECMDGOALS), kvm)
