@@ -4,16 +4,23 @@
  * You may not use this file except in compliance with the License.
  */
 
-#include <unikit/essentials.h>
 #include <unikit/plat/bootinfo.h>
 
-static struct unikit_bootinfo bi;
+#include <unikit/essentials.h>
 
-struct unikit_bootinfo *unikit_get_bootinfo() {
+static struct unikit_memory_desc mds[UNIKIT_MEMORY_DESCRIPTOR_MAX_COUNT];
+
+static struct unikit_bootinfo bi = {
+	.magic = BOOTINFO_MAGIC,
+	.mmap = {
+		.capacity = sizeof(mds) / sizeof(struct unikit_memory_desc),
+		.cnt = 0,
+		.mds = mds
+	}
+};
+
+const struct unikit_bootinfo *unikit_get_bootinfo() {
 	if (unlikely(bi.magic != BOOTINFO_MAGIC)) return NULL;
 	return &bi;
 }
 
-void unikit_set_bootinfo(struct unikit_bootinfo new_bi) {
-	bi = new_bi;
-}

@@ -28,15 +28,9 @@ struct unikit_bootinfo {
 };
 
 /**
- * Gets the boot information structure
+ * Gets the address of boot information structure
  * @return Address of boot information structure
  */
-struct unikit_bootinfo *unikit_get_bootinfo();
-
-/**
- * Sets the boot information structure
- * @param new_bi Boot information structure to set
- */
-void unikit_set_bootinfo(struct unikit_bootinfo new_bi);
+const struct unikit_bootinfo *unikit_get_bootinfo();
 
 #endif /* __UNIKIT_PLAT_BOOTINFO_H__ */

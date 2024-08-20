@@ -28,10 +28,10 @@ struct unikit_memory_map {
 	u32 capacity;
 	/** Current number of descriptors in the map */
 	u32 cnt;
-	/** Array of memory descriptors */
+	/** Pointer to array of memory descriptors */
 	struct unikit_memory_desc *mds;
 };
 
-void unikit_memory_map_insert(struct unikit_memory_desc md);
+int unikit_memory_map_insert(struct unikit_memory_map *mmap, struct unikit_memory_desc *md);
 
 #endif /* __UNIKIT_PLAT_MEMORY_H__ */

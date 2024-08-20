@@ -4,13 +4,27 @@
  * You may not use this file except in compliance with the License.
  */
 
-#include <unikit/essentials.h>
 #include <unikit/plat/memory.h>
 
-static struct unikit_memory_desc mds[UNIKIT_MEMORY_DESCRIPTOR_MAX_COUNT];
+#include <unikit/essentials.h>
+#include <unikit/errno.h>
+#include <unikit/plat/nostd.h>
 
-static struct unikit_memory_map mmap = {
-	.capacity = 0,
-	.cnt = 0,
-	.mds = mds
-};
+ int unikit_memory_map_insert(struct unikit_memory_map *mmap, struct unikit_memory_desc *md) {
+	if (unlikely(!md->len))
+		return -EINVAL;
+
+	if (unlikely(mmap->cnt >= mmap->capacity))
+		return -ENOMEM;
+
+	int i;
+	for (i = mmap->cnt; i > 0; i--) {
+		if (mmap->mds[i].base + mmap->mds[i].len <= md->base) break;
+	}
+
+	memmove(mmap->mds + i + 1, mmap->mds + i, sizeof(struct unikit_memory_desc) * i);
+
+	mmap->mds[i] = *md;
+	mmap->cnt++;
+	return i;
+}
