@@ -5,6 +5,7 @@
  */
 
 #include <unikit/plat/console.h>
+
 #include <unikit/arch/x86/serial.h>
 
 int kvm_console_init() {

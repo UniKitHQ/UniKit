@@ -10,7 +10,7 @@
 #include <unikit/errno.h>
 #include <unikit/plat/nostd.h>
 
- int unikit_memory_map_insert(struct unikit_memory_map *mmap, struct unikit_memory_desc *md) {
+int unikit_memory_map_insert(struct unikit_memory_map *mmap, struct unikit_memory_desc *md) {
 	if (unlikely(!md->len))
 		return -EINVAL;
 

@@ -18,3 +18,4 @@ LINKER_SCRIPT = link.x
 ENTRYPOINT = _multiboot_entry
 
 ELF64_TO_32 = i386
+

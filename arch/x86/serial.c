@@ -5,6 +5,7 @@
  */
 
 #include <unikit/arch/x86/serial.h>
+
 #include <unikit/arch/x86/asm.h>
 
 #define COM1 0x3f8
@@ -42,8 +43,8 @@ static void serial_write(char i) {
 }
 
 void serial_putc(char i) {
-	if (i == '\n') 
-		serial_write('\r');
+	if (i == '\n') serial_write('\r');
+
 	serial_write(i);
 }
 
