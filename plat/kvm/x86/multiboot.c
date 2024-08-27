@@ -9,8 +9,8 @@
 #include <unikit/plat/bootinfo.h>
 
 struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
-	.magic = MULTIBOOT_HEADER_MAGIC,
-	.flags = MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO,
+	.magic    = MULTIBOOT_HEADER_MAGIC,
+	.flags    = MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO,
 	.checksum = -(MULTIBOOT_HEADER_MAGIC + (MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO)),
 };
 
@@ -31,4 +31,19 @@ void multiboot_entry(struct multiboot_info *mi) {
 		}
 	}
 
+	if (mi->flags & MULTIBOOT_INFO_MEM_MAP) {
+		multiboot_memory_map_t *m;
+		for (sz i = 0; i < mi->mmap_length; i += m->size + sizeof(m->size)) {
+			m = (multiboot_memory_map_t *)(mi->mmap_addr + i);
+
+			struct unikit_memory_desc md = {
+				.base  = m->addr,
+				.len   = m->len,
+				.type  = m->type == MULTIBOOT_MEMORY_AVAILABLE ? UNIKIT_MEMORY_TYPE_FREE : UNIKIT_MEMORY_TYPE_RESERVED,
+				.flags = m->type == MULTIBOOT_MEMORY_AVAILABLE ? UNIKIT_MEMORY_PERMISSION_READ | UNIKIT_MEMORY_PERMISSION_WRITE : 0x00,
+			};
+
+			unikit_memory_map_insert(&bi->mmap, &md);
+		}
+	}
 }

@@ -11,6 +11,13 @@
 #include <stddef.h>
 
 #define UNIKIT_MEMORY_DESCRIPTOR_MAX_COUNT 64
+ 
+#define UNIKIT_MEMORY_TYPE_FREE          0x00
+#define UNIKIT_MEMORY_TYPE_RESERVED      0x01
+
+#define UNIKIT_MEMORY_PERMISSION_READ    0x01
+#define UNIKIT_MEMORY_PERMISSION_WRITE   0x02
+#define UNIKIT_MEMORY_PERMISSION_EXECUTE 0x04
 
 struct unikit_memory_desc {
 	/** Physical base address */
@@ -18,9 +25,9 @@ struct unikit_memory_desc {
 	/** Length in bytes */
 	sz len;
 	/** Memory type */
-	u16 type;
+	u8 type;
 	/** Memory flags */
-	u16 flags;
+	u8 flags;
 };
 
 struct unikit_memory_map {
