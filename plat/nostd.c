@@ -8,7 +8,7 @@
 
 void *memcpy(void *dst, const void *src, sz len) {
 	sz i = 0;
-	for (; len-- > 0; i++)
+	for (; len--; i++)
 		((u8 *)dst)[i] = ((u8 *)src)[i];
 
 	return dst;
@@ -26,7 +26,7 @@ void *memmove(void *dst, const void *src, sz len) {
 		s += len - 1;
 		d += len - 1;
 
-		while (len-- > 0)
+		while (len--)
 			*((u8 *)d--) = *((u8 *)s--);
 	}
 
@@ -36,7 +36,7 @@ void *memmove(void *dst, const void *src, sz len) {
 void *memset(void *dst, int value, sz len) {
 	void *ptr = dst;
 
-	while (len-- > 0)
+	while (len--)
 		*((u8 *)ptr++) = (u8)value;
 
 	return dst;
@@ -46,7 +46,7 @@ int memcmp(const void *s1, const void *s2, sz len) {
 	const void *p1 = s1;
 	const void *p2 = s2;
 
-	for (; len-- > 0; p1++, p2++)
+	for (; len--; p1++, p2++)
 		if (*((u8 *)p1) != *((u8 *)p2))
 			return *((u8 *)p1) - *((u8 *)p2);
 
