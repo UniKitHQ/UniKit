@@ -35,8 +35,8 @@ gdt64_ptr:
 
 .section .text.boot.32
 .code32
-.globl boot_32
-boot_32:
+.globl boot32
+boot32:
 	/* Enable physical address extension (PAE) */
 	mov eax, X86_CR4_PAE
 	mov cr4, eax
@@ -68,7 +68,7 @@ wrap_up:
 	mov ss, eax
 	mov ds, eax
 
-	jmp boot_64
+	jmp boot64
 
 /*
  * 64-bit boot entry function
@@ -84,8 +84,8 @@ wrap_up:
  */
 
 .section .text.boot.64
-.globl boot_64
-boot_64:
+.globl boot64
+boot64:
     mov rsp, rsi /* Set up boot stack */
 
     push rdx

@@ -7,8 +7,8 @@
 /*
  * ┌───────────────────────┐   ┌─────────────────┐
  * │   multiboot.S         │   │   boot.S        │
- * │   _multiboot_entry:   ├──►│   boot_32:      │
- * └───────────────────────┘   │   boot_64:      │
+ * │   _multiboot_entry:   ├──►│   boot32:       │
+ * └───────────────────────┘   │   boot64:       │
  *                             └────────┬────────┘
  *                                      │
  *      ┌────────────────────────────┐  │
@@ -43,7 +43,7 @@ _multiboot_entry:
 	mov edi, offset multiboot_entry /* Boot function address */
 	mov esi, offset boot_stack      /* Boot stack address */
 	mov edx, ebx                    /* Multiboot information structure */
-	call boot_32
+	call boot32
 
 magic_mismatch:
 	hlt
