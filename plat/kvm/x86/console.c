@@ -8,7 +8,7 @@
 
 #include <unikit/arch/x86/serial.h>
 
-int kvm_console_init() {
+int console_init() {
 	serial_init();
 	return 0;
 }

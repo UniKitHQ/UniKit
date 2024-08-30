@@ -7,6 +7,6 @@
 #ifndef __UNIKIT_PLAT_KVM_CONSOLE_H__
 #define __UNIKIT_PLAT_KVM_CONSOLE_H__
 
-int kvm_console_init();
+int console_init();
 
 #endif /* __UNIKIT_PLAT_KVM_CONSOLE_H__ */
