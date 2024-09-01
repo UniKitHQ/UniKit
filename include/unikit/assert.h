@@ -15,15 +15,15 @@
 /* TODO: termination */
 #undef ASSERT
 #define ASSERT(x)                                              \
-	do {                                                       \
-		if (unlikely(!(x))) {                                  \
-			PRINT(__FILE__ ":");                               \
-			PRINT(STRINGIFY(__LINE__) ": ");                   \
-			PRINT("assertion \"" STRINGIFY(x) "\" failed.\n"); \
-			PRINT("in function \"");                           \
-			PRINT(__PRETTY_FUNCTION__);                        \
-			PRINT("\"\n");                                     \
-		}                                                      \
-	} while (0)
+    do {                                                       \
+        if (unlikely(!(x))) {                                  \
+            PRINT(__FILE__ ":");                               \
+            PRINT(STRINGIFY(__LINE__) ": ");                   \
+            PRINT("assertion \"" STRINGIFY(x) "\" failed.\n"); \
+            PRINT("in function \"");                           \
+            PRINT(__PRETTY_FUNCTION__);                        \
+            PRINT("\"\n");                                     \
+        }                                                      \
+    } while (0)
 
 #endif /* __UNIKIT_ASSERT_H__ */

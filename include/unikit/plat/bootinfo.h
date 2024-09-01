@@ -11,20 +11,20 @@
 #include <unikit/plat/memory.h>
 
 struct unikit_bootinfo {
-	/** Boot info magic */
-	#define BOOTINFO_MAGIC 0xB0071EF0
-	u32 magic;
+    /** Boot info magic */
+    #define BOOTINFO_MAGIC 0xB0071EF0
+    u32 magic;
 
-	/** Boot loader identifier */
-	u8 *bootloader;
-	/** Boot protocol identifier */
-	u8 *protocol;
+    /** Boot loader identifier */
+    u8 *bootloader;
+    /** Boot protocol identifier */
+    u8 *protocol;
 
-	/** Boot command line */
-	u8 *cmdline;
+    /** Boot command line */
+    u8 *cmdline;
 
-	/** Memory map */
-	struct unikit_memory_map mmap;
+    /** Memory map */
+    struct unikit_memory_map mmap;
 };
 
 /**

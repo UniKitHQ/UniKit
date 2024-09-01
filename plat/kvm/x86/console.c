@@ -9,20 +9,20 @@
 #include <unikit/arch/x86/serial.h>
 
 int console_init() {
-	serial_init();
-	return 0;
+    serial_init();
+    return 0;
 }
 
 int unikit_puts(const char *str, sz len) {
-	for (int i = 0; i < len; i++) {
-		serial_putc(str[i]);
-	}
-	return len;
+    for (int i = 0; i < len; i++) {
+        serial_putc(str[i]);
+    }
+    return len;
 }
 
 int unikit_gets(char *buf, sz len) {
-	for (int i = 0; i < len; i++) {
-			buf[i] = serial_getc();
-	}
-	return len;
+    for (int i = 0; i < len; i++) {
+            buf[i] = serial_getc();
+    }
+    return len;
 }

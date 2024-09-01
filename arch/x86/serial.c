@@ -22,42 +22,42 @@
 #define PROT 0x03 /* 8 bits, no parity, one stop bit */
 
 void serial_init() {
-	outb(COM1_INTR, 0x00); /* Disable all interrupts */
-	outb(COM1_CTRL, DLAB); /* Enable DLAB (set baud rate divisor) */
+    outb(COM1_INTR, 0x00); /* Disable all interrupts */
+    outb(COM1_CTRL, DLAB); /* Enable DLAB (set baud rate divisor) */
 
-	/* Set divisor to 3 */
-	outb(COM1_DIV_LO, 0x01); /* LOW */
-	outb(COM1_DIV_HI, 0x00); /* HIGH */
+    /* Set divisor to 3 */
+    outb(COM1_DIV_LO, 0x01); /* LOW */
+    outb(COM1_DIV_HI, 0x00); /* HIGH */
 
-	outb(COM1_CTRL, PROT);
+    outb(COM1_CTRL, PROT);
 }
 
 static int serial_tx_empty() {
-	return inb(COM1_STATUS) & 0x20;
+    return inb(COM1_STATUS) & 0x20;
 }
 
 static void serial_write(char i) {
-	while (!serial_tx_empty());
+    while (!serial_tx_empty());
 
-	outb(COM1, i);
+    outb(COM1, i);
 }
 
 void serial_putc(char i) {
-	if (i == '\n') serial_write('\r');
+    if (i == '\n') serial_write('\r');
 
-	serial_write(i);
+    serial_write(i);
 }
 
 static int serial_rx_ready(void) {
-	return inb(COM1_STATUS) & 0x01;
+    return inb(COM1_STATUS) & 0x01;
 }
 
 static int serial_read() {
-	while (!serial_rx_ready());
+    while (!serial_rx_ready());
 
-	return inb(COM1);
+    return inb(COM1);
 }
 
 int serial_getc() {
-	return serial_read();
+    return serial_read();
 }

@@ -20,23 +20,23 @@
 #define UNIKIT_MEMORY_PERMISSION_EXECUTE 0x04
 
 struct unikit_memory_desc {
-	/** Physical base address */
-	u64 base;
-	/** Length in bytes */
-	sz len;
-	/** Memory type */
-	u8 type;
-	/** Memory flags */
-	u8 flags;
+    /** Physical base address */
+    u64 base;
+    /** Length in bytes */
+    sz len;
+    /** Memory type */
+    u8 type;
+    /** Memory flags */
+    u8 flags;
 };
 
 struct unikit_memory_map {
-	/** Maximum descriptors in the map */
-	u32 capacity;
-	/** Current number of descriptors in the map */
-	u32 cnt;
-	/** Pointer to array of memory descriptors */
-	struct unikit_memory_desc *mds;
+    /** Maximum descriptors in the map */
+    u32 capacity;
+    /** Current number of descriptors in the map */
+    u32 cnt;
+    /** Pointer to array of memory descriptors */
+    struct unikit_memory_desc *mds;
 };
 
 int unikit_memory_map_insert(struct unikit_memory_map *mmap, struct unikit_memory_desc *md);

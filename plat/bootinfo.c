@@ -11,16 +11,16 @@
 static struct unikit_memory_desc mds[UNIKIT_MEMORY_DESCRIPTOR_MAX_COUNT];
 
 static struct unikit_bootinfo bi = {
-	.magic = BOOTINFO_MAGIC,
-	.mmap = {
-		.capacity = sizeof(mds) / sizeof(struct unikit_memory_desc),
-		.cnt = 0,
-		.mds = mds
-	}
+    .magic = BOOTINFO_MAGIC,
+    .mmap = {
+        .capacity = sizeof(mds) / sizeof(struct unikit_memory_desc),
+        .cnt = 0,
+        .mds = mds
+    }
 };
 
 const struct unikit_bootinfo *unikit_get_bootinfo() {
-	if (unlikely(bi.magic != BOOTINFO_MAGIC)) return NULL;
-	return &bi;
+    if (unlikely(bi.magic != BOOTINFO_MAGIC)) return NULL;
+    return &bi;
 }
 

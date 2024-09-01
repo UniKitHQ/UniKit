@@ -7,48 +7,48 @@
 #include <unikit/essentials.h>
 
 void *memcpy(void *dst, const void *src, sz len) {
-	sz i = 0;
-	for (; len--; i++)
-		((u8 *)dst)[i] = ((u8 *)src)[i];
+    sz i = 0;
+    for (; len--; i++)
+        ((u8 *)dst)[i] = ((u8 *)src)[i];
 
-	return dst;
+    return dst;
 }
 
 void *memmove(void *dst, const void *src, sz len) {
-	void *d = dst;
-	const void *s = src;
+    void *d = dst;
+    const void *s = src;
 
-	if (dst == src) return dst;
-	else if (src > dst) {
-		while (len-- > 0)
-			*(u8 *)(d++) = *((u8 *)s++);
-	} else if (src < dst) {
-		s += len - 1;
-		d += len - 1;
+    if (dst == src) return dst;
+    else if (src > dst) {
+        while (len-- > 0)
+            *(u8 *)(d++) = *((u8 *)s++);
+    } else if (src < dst) {
+        s += len - 1;
+        d += len - 1;
 
-		while (len--)
-			*((u8 *)d--) = *((u8 *)s--);
-	}
+        while (len--)
+            *((u8 *)d--) = *((u8 *)s--);
+    }
 
-	return dst;
+    return dst;
 }
 
 void *memset(void *dst, int value, sz len) {
-	void *ptr = dst;
+    void *ptr = dst;
 
-	while (len--)
-		*((u8 *)ptr++) = (u8)value;
+    while (len--)
+        *((u8 *)ptr++) = (u8)value;
 
-	return dst;
+    return dst;
 }
 
 int memcmp(const void *s1, const void *s2, sz len) {
-	const void *p1 = s1;
-	const void *p2 = s2;
+    const void *p1 = s1;
+    const void *p2 = s2;
 
-	for (; len--; p1++, p2++)
-		if (*((u8 *)p1) != *((u8 *)p2))
-			return *((u8 *)p1) - *((u8 *)p2);
+    for (; len--; p1++, p2++)
+        if (*((u8 *)p1) != *((u8 *)p2))
+            return *((u8 *)p1) - *((u8 *)p2);
 
-	return 0;
+    return 0;
 }
