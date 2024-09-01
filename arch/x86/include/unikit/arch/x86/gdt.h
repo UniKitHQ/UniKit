@@ -44,7 +44,7 @@
 
 #ifndef __ASSEMBLY__
 
-struct x86_gdt64 {
+struct x86_gdt {
     u64 limit_low  : 16; /* low 16 bit of limit value */
     u64 base_low   : 24; /* low 24 bit of base address */
     u64 type       : 4;  /* segment type */
