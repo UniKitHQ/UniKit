@@ -8,6 +8,8 @@
 #include <unikit/plat/kvm/multiboot.h>
 #include <unikit/plat/bootinfo.h>
 
+extern void boot_entry(struct unikit_bootinfo *bi);
+
 struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
     .magic    = MULTIBOOT_HEADER_MAGIC,
     .flags    = MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO,
@@ -46,4 +48,6 @@ void multiboot_entry(struct multiboot_info *mi) {
             unikit_memory_map_insert(&bi->mmap, &md);
         }
     }
+
+    boot_entry(bi);
 }

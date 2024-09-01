@@ -7,6 +7,7 @@ INCLUDE_DIRS = 	../include \
 SRCS = 	multiboot.S \
 		multiboot.c \
 		boot.S \
+		boot.c \
 		pagetable.S \
 		console.c \
 		../../bootinfo.c \
