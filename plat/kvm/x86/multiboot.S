@@ -36,15 +36,15 @@ boot_stack:
 .code32
 .globl _multiboot_entry
 _multiboot_entry:
-	cmp	eax, MULTIBOOT_BOOTLOADER_MAGIC
+    cmp    eax, MULTIBOOT_BOOTLOADER_MAGIC
 
-	jne magic_mismatch
+    jne magic_mismatch
 
-	mov edi, offset multiboot_entry /* Boot function address */
-	mov esi, offset boot_stack      /* Boot stack address */
-	mov edx, ebx                    /* Multiboot information structure */
-	call boot32
+    mov edi, offset multiboot_entry /* Boot function address */
+    mov esi, offset boot_stack      /* Boot stack address */
+    mov edx, ebx                    /* Multiboot information structure */
+    call boot32
 
 magic_mismatch:
-	hlt
-	jmp	magic_mismatch
+    cli
+    hlt

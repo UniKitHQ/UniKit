@@ -17,37 +17,37 @@ PHDRS {
 }
 
 SECTIONS {
-	. = 0x100000;
+    . = 0x100000;
 
-	.boot : {
-		KEEP (*(.data.boot))
-		KEEP (*(.data.boot.*))
+    .boot : {
+        KEEP (*(.data.boot))
+        KEEP (*(.data.boot.*))
 
-		*(.text.boot)
-		*(.text.boot.*)
-	}
+        *(.text.boot)
+        *(.text.boot.*)
+    }
 
-	.text :
-	{
-		*(.text)
-		*(.text.*)
-	} :text
+    .text :
+    {
+        *(.text)
+        *(.text.*)
+    } :text
 
-	.bss :
-	{
-	    *(.bss)
-	    *(.bss.*)
-	}
+    .bss :
+    {
+        *(.bss)
+        *(.bss.*)
+    }
 
-	.data :
-	{
-		*(.data)
-		*(.data.*)
-	} :data
+    .data :
+    {
+        *(.data)
+        *(.data.*)
+    } :data
 
-	.rodata :
-	{
-		*(.rodata)
-		*(.rodata.*)
-	} :rodata
+    .rodata :
+    {
+        *(.rodata)
+        *(.rodata.*)
+    } :rodata
 }
