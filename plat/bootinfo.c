@@ -7,6 +7,7 @@
 #include <unikit/plat/bootinfo.h>
 
 #include <unikit/essentials.h>
+#include <unikit/assert.h>
 
 static struct unikit_memory_desc mds[UNIKIT_MEMORY_DESCRIPTOR_MAX_COUNT];
 
@@ -20,7 +21,6 @@ static struct unikit_bootinfo bi = {
 };
 
 const struct unikit_bootinfo *unikit_get_bootinfo() {
-    if (unlikely(bi.magic != BOOTINFO_MAGIC)) return NULL;
+    ASSERT(bi.magic == BOOTINFO_MAGIC);
     return &bi;
 }
-
