@@ -9,7 +9,6 @@
 
 #include <unikit/essentials.h>
 
-
 void *memcpy(void *dst, const void *src, sz len);
 void *memmove(void *dst, const void *src, sz len);
 void *memset(void *dst, int value, sz len);
