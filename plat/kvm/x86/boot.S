@@ -56,13 +56,15 @@ boot32:
     /* Load GDT and jump to 64-bit code segment */
     lgdt gdt64_ptr
 
-    .att_syntax
-    ljmp $(gdt64_cs - gdt64), $wrap_up
+    ljmp jd
+jd:
+    .long wrap_up
+    .word gdt64_cs - gdt64
 
 .code64
 wrap_up:
-    mov $(gdt64_ds - gdt64), %eax
-    .intel_syntax noprefix
+    .equ dss, gdt64_ds - gdt64
+    mov eax, offset dss
 
     mov es, eax
     mov ss, eax
