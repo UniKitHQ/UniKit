@@ -10,7 +10,7 @@
 
 extern void boot_entry(struct unikit_bootinfo *bi);
 
-struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
+struct multiboot_header hdr __section(".data.boot") __align(4) __used = {
     .magic    = MULTIBOOT_HEADER_MAGIC,
     .flags    = MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO,
     .checksum = -(MULTIBOOT_HEADER_MAGIC + (MULTIBOOT_PAGE_ALIGN | MULTIBOOT_MEMORY_INFO)),

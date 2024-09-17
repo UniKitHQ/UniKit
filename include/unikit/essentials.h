@@ -16,8 +16,8 @@
 #undef __section
 #define __section(_section_name) __attribute__((section(_section_name)))
 
-#undef __aligned
-#define __aligned(_n) __attribute__((aligned(_n)))
+#undef __align
+#define __align(_n) __attribute__((aligned(_n)))
 
 #undef __used
 #define __used __attribute__((used))
