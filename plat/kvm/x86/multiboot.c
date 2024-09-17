@@ -17,7 +17,7 @@ struct multiboot_header hdr __section(".data.boot") __aligned(4) __used = {
 };
 
 void multiboot_entry(struct multiboot_info *mi) {
-    struct unikit_bootinfo *bi = (struct unikit_bootinfo *)unikit_get_bootinfo();
+    struct unikit_bootinfo *const bi = unikit_get_bootinfo();
 
     bi->protocol = (u8 *)"multiboot";
 

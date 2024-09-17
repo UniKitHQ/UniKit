@@ -20,7 +20,7 @@ static struct unikit_bootinfo bi = {
     }
 };
 
-const struct unikit_bootinfo *unikit_get_bootinfo() {
+struct unikit_bootinfo *const unikit_get_bootinfo() {
     ASSERT(bi.magic == BOOTINFO_MAGIC);
     return &bi;
 }

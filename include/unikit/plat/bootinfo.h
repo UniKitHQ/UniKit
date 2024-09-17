@@ -31,6 +31,6 @@ struct unikit_bootinfo {
  * Gets the address of boot information structure
  * @return Address of boot information structure
  */
-const struct unikit_bootinfo *unikit_get_bootinfo();
+struct unikit_bootinfo *const unikit_get_bootinfo();
 
 #endif /* __UNIKIT_PLAT_BOOTINFO_H__ */
