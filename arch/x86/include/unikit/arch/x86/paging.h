@@ -9,6 +9,8 @@
 
 #include <unikit/essentials.h>
 
+#define PAGE_SIZE (1 << 12)
+
 struct x86_pml5e {
     u64 p             : 1;  /* present */
     u64 rw            : 1;  /* read / write */
