@@ -21,7 +21,7 @@ struct x86_pml5e {
     u64 pml4_address  : 40;
     u64               : 11;
     u64 xd            : 1;  /* execute disable */
-};
+} __packed;
 
 struct x86_pml4e {
     u64 p             : 1;
@@ -35,7 +35,7 @@ struct x86_pml4e {
     u64 pdpt_address : 40;
     u64               : 11;
     u64 xd            : 1;
-};
+} __packed;
 
 struct x86_pdpte {
     u64 p             : 1;
@@ -51,7 +51,7 @@ struct x86_pdpte {
     u64 pd_address    : 40;
     u64               : 11;
     u64 xd            : 1;
-};
+} __packed;
 
 struct x86_pdpte_1gb {
     u64 p             : 1;
@@ -71,7 +71,7 @@ struct x86_pdpte_1gb {
     u64               : 7;
     u64 pk            : 4;  /* protection key */
     u64 xd            : 1;
-};
+} __packed;
 
 struct x86_pde {
     u64 p             : 1;
@@ -87,7 +87,7 @@ struct x86_pde {
     u64 pt_address   : 40;
     u64               : 11;
     u64 xd            : 1;
-};
+} __packed;
 
 struct x86_pde_2mb {
     u64 p             : 1;
@@ -107,7 +107,7 @@ struct x86_pde_2mb {
     u64               : 7;
     u64 pk            : 4;
     u64 xd            : 1;
-};
+} __packed;
 
 struct x86_pte_4kb {
     u64 p             : 1;
@@ -125,6 +125,6 @@ struct x86_pte_4kb {
     u64               : 7;
     u64 pk            : 4;
     u64 xd            : 1;
-};
+} __packed;
 
 #endif /* __UNIKIT_ARCH_X86_PAGING_H__ */
