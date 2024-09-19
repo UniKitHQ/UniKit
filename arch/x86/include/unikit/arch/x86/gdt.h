@@ -11,7 +11,7 @@
 
 /* Segment Limit                    : 0xFFFF
  * Base                             : 0x00000000
- * Type                             : 0x1010b (code/execute/read/accessed)
+ * Type                             : 0b1010 (code/execute/read/accessed)
  * Code or Data Segment (S)         : 0x1 (true)
  * Descriptor Privilege Level (DPL) : 0x0 (kernel)
  * Segment Present (P)              : 0x1 (true)
@@ -22,7 +22,7 @@
 
 /* Segment Limit                    : 0xFFFF
  * Base                             : 0x00000000
- * Type                             : 0x0011b (data/read/write/accessed)
+ * Type                             : 0b0011 (data/read/write/accessed)
  * Code or Data Segment (S)         : 0x1 (true)
  * Descriptor Privilege Level (DPL) : 0x0 (kernel)
  * Segment Present (P)              : 0x1 (true)
@@ -32,7 +32,7 @@
 
 /* Segment Limit                    : 0xFFFF
  * Base                             : 0x00000000
- * Type                             : 0x1011b (code/execute/read/accessed)
+ * Type                             : 0b1011 (code/execute/read/accessed)
  * Code or Data Segment (S)         : 0x1 (true)
  * Descriptor Privilege Level (DPL) : 0x0 (kernel)
  * Segment Present (P)              : 0x1 (true)
