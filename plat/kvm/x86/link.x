@@ -6,7 +6,7 @@
 
 /*
  * Executable 0x01
- * Writeable  0x02
+ * Writable  0x02
  * Readable   0x04
  */
 
