@@ -26,6 +26,10 @@ static inline void lgdt(u64 gdtr) {
     asm volatile("lgdt [%0]" : : "r"(gdtr));
 }
 
+static inline void lidt(u64 idtr) {
+    asm volatile("lidt [%0]" : : "r"(idtr));
+}
+
 static inline void ltr(u16 ss) {
     asm volatile("ltr %0" : : "r"(ss));
 }

@@ -101,4 +101,7 @@
 
 #define X86_CPUID_7_EBX_AVX512F (1 << 16)
 
+#define X86_DPL_KERNEL 0b00
+#define X86_DPL_USER   0b11
+
 #endif /* __UNIKIT_ARCH_X86_CPU_H__ */

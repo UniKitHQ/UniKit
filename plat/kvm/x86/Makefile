@@ -14,6 +14,8 @@ SRCS = 	multiboot.S \
 		../../memory.c \
 		../../nostd.c \
 		../../../arch/x86/serial.c \
+ 		../../../arch/x86/traps.c \
+		../../../arch/x86/traps.S \
 		../../../arch/x86/gdt.c
 
 LINKER_SCRIPT = link.x

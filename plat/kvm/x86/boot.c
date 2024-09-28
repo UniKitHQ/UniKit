@@ -8,10 +8,13 @@
 #include <unikit/plat/bootinfo.h>
 #include <unikit/plat/kvm/console.h>
 #include <unikit/arch/x86/gdt.h>
+#include <unikit/arch/x86/traps.h>
 
 void boot_entry(struct unikit_bootinfo *bi) {
     console_init();
 
     gdt_init();
     tss_init();
+
+    idt_init();
 }
