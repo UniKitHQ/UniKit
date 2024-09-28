@@ -19,7 +19,7 @@ void gdt_init() {
 
     struct x86_gdtr gdtr = {
         .limit = sizeof(gdt) - 1,
-        .base = (u64)gdt
+        .base = (u64)&gdt
     };
 
     lgdt((u64)&gdtr);
