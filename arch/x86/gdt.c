@@ -6,6 +6,7 @@
 
 #include <unikit/arch/x86/gdt.h>
 
+#include <unikit/arch/x86/config.h>
 #include <unikit/arch/x86/asm.h>
 #include <unikit/arch/x86/paging.h>
 
@@ -33,21 +34,21 @@ void gdt_init() {
 static __align(8)
 struct x86_tss tss;
 
+/*
+ * Each index of IST corresponds to the following stack
+ * 0 Interrupt Stack
+ * 1 Trap      Stack
+ * 2 Critical  Stack
+ */
 static __align(8)
-u8 ist1[PAGE_SIZE]; /* Interrupt Stack */
-
-static __align(8)
-u8 ist2[PAGE_SIZE]; /* Trap Stack */
-
-static __align(8)
-u8 ist3[PAGE_SIZE]; /* Critical Stack */
+u8 ist[3][CONFIG_STACK_SIZE];
 
 void tss_init() {
     tss.iopb = sizeof(tss);
-    
-    tss.ist[0] = (u64)ist1;
-    tss.ist[1] = (u64)ist2;
-    tss.ist[2] = (u64)ist3;
+
+    tss.ist[0] = (u64)ist[0];
+    tss.ist[1] = (u64)ist[1];
+    tss.ist[2] = (u64)ist[2];
 
     struct x86_gdt_desc *tssd;
 
