@@ -58,21 +58,28 @@
 
 #ifndef __ASSEMBLY__
 
+struct x86_gdtr {
+    u16 limit;
+	u64 base;
+} __packed;
+
 struct x86_gdt_desc {
     union {
         struct {
-            u64 limit_low  : 16; /* low 16 bit of limit value */
-            u64 base_low   : 24; /* low 24 bit of base address */
-            u64 type       : 4;  /* segment type */
-            u64 s          : 1;  /* descriptor type */
-            u64 dpl        : 2;  /* descriptor privilege level */
-            u64 p          : 1;  /* present */
-            u64 limit_high : 4;  /* high 4 bit of limit value */
-            u64 avl        : 1;  /* available for use */
+            u64 limit_low  : 16; /* Low 16 bit of limit value */
+            u64 base_low   : 24; /* Low 24 bit of base address */
+            u64 type       : 4;  /* Segment type */
+            u64 s          : 1;  /* Descriptor type */
+            u64 dpl        : 2;  /* Descriptor privilege level */
+            u64 p          : 1;  /* Present */
+            u64 limit_high : 4;  /* High 4 bit of limit value */
+            u64 avl        : 1;  /* Available for use */
             u64 l          : 1;  /* 64-bit code segment */
-            u64 db         : 1;  /* default operation size (0 = 64-bit, 1 = 32-bit segment) */
-            u64 g          : 1;  /* granularity (0 = limit, 1 = limit * 4KB) */
-            u64 base_high  : 8;  /* high 8 bit of base address */
+            u64 db         : 1;  /* Default operation size (0 = 64-bit, 1 = 32-bit segment) */
+            u64 g          : 1;  /* Granularity (0 = limit, 1 = limit * 4KB) */
+            u64 base_high  : 8;  /* High 8 bit of base address */
+        };
+
         /* Expanded descriptor for TSS and LDT */
         struct {
             u64 x_base_high: 32;
@@ -81,11 +88,6 @@ struct x86_gdt_desc {
 
         u64 raw;
     };
-} __packed;
-
-struct x86_gdtr {
-    u16 limit;
-	u64 base;
 } __packed;
 
 struct x86_tss {
