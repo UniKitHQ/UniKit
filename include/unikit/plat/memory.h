@@ -8,7 +8,6 @@
 #define __UNIKIT_PLAT_MEMORY_H__
 
 #include <unikit/essentials.h>
-#include <stddef.h>
 
 #define UNIKIT_MEMORY_DESCRIPTOR_MAX_COUNT 64
  
