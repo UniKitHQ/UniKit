@@ -7,7 +7,6 @@
 #ifndef __UNIKIT_ARCH_X86_ASM_H__
 #define __UNIKIT_ARCH_X86_ASM_H__
 
-#include "unikit/arch/x86/gdt.h"
 #include <unikit/essentials.h>
 
 static inline void outb(u16 PORT, u8 value) {
@@ -33,11 +32,11 @@ static inline void ltr(u16 ss) {
 
 static inline void set_cs(u16 ss) {
     asm volatile(
-        "push %[ss];"
+        "push %0;"
         "push offset wrap_up;"
         "retfq;"
         "wrap_up:;"
-        : : [ss]"m"(ss) :
+        : : "m"(ss) :
     );
 };
 
