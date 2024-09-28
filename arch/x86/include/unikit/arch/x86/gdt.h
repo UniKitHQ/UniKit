@@ -49,6 +49,7 @@
 #define GDT_DATA     2
 #define GDT_TSS_LOW  3
 #define GDT_TSS_HIGH 4
+#define GDT_TSS      GDT_TSS_LOW
 
 #define GDT_TYPE_TSS_AVAIL 0b1001
 #define GDT_TYPE_TSS_BUSY  0b1011
@@ -72,6 +73,10 @@ struct x86_gdt_desc {
             u64 db         : 1;  /* default operation size (0 = 64-bit, 1 = 32-bit segment) */
             u64 g          : 1;  /* granularity (0 = limit, 1 = limit * 4KB) */
             u64 base_high  : 8;  /* high 8 bit of base address */
+        /* Expanded descriptor for TSS and LDT */
+        struct {
+            u64 x_base_high: 32;
+            u64 : 32;
         };
 
         u64 raw;

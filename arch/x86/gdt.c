@@ -60,8 +60,7 @@ void tss_init() {
     tssd->p         = 1;
 
     tssd = &gdt[GDT_TSS_HIGH];
-    tssd->limit_low = (u64)&tss >> 32;
-    tssd->base_low = ((u64)&tss >> 48) & 0xFFFF;
+    tssd->x_base_high = (u64)&tss >> 32;
 
-    ltr(GDT_OFFSET(GDT_TSS_LOW));
+    ltr(GDT_OFFSET(GDT_TSS));
 }
