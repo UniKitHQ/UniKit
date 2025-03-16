@@ -2,7 +2,8 @@
 .clangd
 .cache
 .DS_Store
-zig-cache
+.zig-cache
+zig-out
 
 *.o
 *.bin
