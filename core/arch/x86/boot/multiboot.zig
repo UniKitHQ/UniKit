@@ -3,17 +3,7 @@
 // Copyright (c) 2024, Pribess (Heewon Cho).
 // Licensed under the Elastic-2.0 License.
 // You may not use this file except in compliance with the License.
-
-// ┌───────────────────────┐   ┌─────────────────┐
-// │   multiboot.S         │   │   boot.S        │
-// │   _multiboot_entry:   ├──►│   boot32:       │
-// └───────────────────────┘   │   boot64:       │
-//                             └────────┬────────┘
-//                                      │
-//      ┌────────────────────────────┐  │
-//      │   multiboot.zig            │◄─┘
-//      │   void multibootEntry()    │
-//      └────────────────────────────┘
+//
 
 /// How many bytes from the start of the file we search for the header.
 const MULTIBOOT_SEARCH = 8192;
@@ -30,7 +20,11 @@ const MULTIBOOT_MOD_ALIGN = 0x00001000;
 const MULTIBOOT_INFO_ALIGN = 0x00000004;
 
 pub const MultibootHeader = extern struct {
-    const Flags = packed struct(u32) {
+    /// Must be MULTIBOOT_MAGIC - see above.
+    magic: u32,
+
+    /// Feature flags.
+    flags: packed struct(u32) {
         /// Align all boot modules on i386 page (4KB) boundaries.
         PAGE_ALIGN: bool = false,
         /// Must pass memory information to OS.
@@ -44,29 +38,29 @@ pub const MultibootHeader = extern struct {
         AOUT_KLUDGE: bool = false,
 
         _1: u15 = 0x00,
-    };
-
-    /// Must be MULTIBOOT_MAGIC - see above.
-    magic: u32,
-
-    /// Feature flags.
-    flags: Flags = undefined,
+    },
 
     /// The above fields plus this one must equal 0 mod 2^32.
-    checksum: u32,
+    checksum: u32 = undefined,
 
     /// These are only valid if MULTIBOOT_AOUT_KLUDGE is set.
-    header_addr: u32,
-    load_addr: u32,
-    load_end_addr: u32,
-    bss_end_addr: u32,
-    entry_addr: u32,
+    header_addr: u32 = undefined,
+    load_addr: u32 = undefined,
+    load_end_addr: u32 = undefined,
+    bss_end_addr: u32 = undefined,
+    entry_addr: u32 = undefined,
 
     /// These are only valid if MULTIBOOT_VIDEO_MODE is set.
-    mode_type: u32,
-    width: u32,
-    height: u32,
-    depth: u32,
+    mode_type: u32 = undefined,
+    width: u32 = undefined,
+    height: u32 = undefined,
+    depth: u32 = undefined,
+
+    pub fn init(comptime self: MultibootHeader) MultibootHeader {
+        var header = self;
+        header.checksum = -%(@as(u32, @bitCast(header.flags)) + MULTIBOOT_HEADER_MAGIC);
+        return header;
+    }
 };
 
 pub const MultibootAoutSymbolTable = extern struct {
@@ -84,7 +78,8 @@ pub const MultibootElfSectionHeaderTable = extern struct {
 };
 
 pub const MultibootInfo = extern struct {
-    const Flags = packed struct(u32) {
+    /// Multiboot info version number
+    flags: packed struct(u32) {
         /// is there basic lower/upper memory information?
         MEMORY: bool = false,
         /// is there a boot device set?
@@ -113,9 +108,7 @@ pub const MultibootInfo = extern struct {
         FRAMEBUFFER_INFO: bool = false,
 
         _: u19 = 0x00,
-    };
-    /// Multiboot info version number
-    flags: Flags,
+    },
 
     /// Available memory from BIOS
     mem_lower: u32,
@@ -207,7 +200,7 @@ pub const MultibootMmapEntry = packed struct {
 };
 
 pub const MultibootModList = extern struct {
-    /// The memory used goes from bytes ’mod_start’ to ’mod_end-1’ inclusive
+    /// The memory used goes from bytes 'mod_start' to 'mod_end-1' inclusive
     mod_start: u32,
     mod_end: u32,
 
@@ -231,17 +224,15 @@ pub const MultibootApmInfo = extern struct {
     dseg_len: u16,
 };
 
-const flags = MultibootHeader.Flags{
-    .PAGE_ALIGN = true,
-    .MEMORY_INFO = true,
-};
-export const multiboot_header = .{
+export const multiboot_header = (MultibootHeader{
     .magic = MULTIBOOT_HEADER_MAGIC,
-    .flags = flags,
-    .checksum = -%(MULTIBOOT_HEADER_MAGIC + @as(u32, @bitCast(flags))),
-};
+    .flags = .{
+        .PAGE_ALIGN = true,
+        .MEMORY_INFO = true,
+    },
+}).init();
 
-var boot_stack: [4096]u8 linksection(".bss") = undefined;
+export var boot_stack: [4096]u8 linksection(".bss") = undefined;
 
 /// 32-bit multiboot entry function
 /// EAX = multiboot bootloader magic
@@ -249,24 +240,26 @@ var boot_stack: [4096]u8 linksection(".bss") = undefined;
 /// GDT with descriptor for 4GB flat CS and DS segments
 /// Interrupts are disabled
 /// DS = ES = FS = GS = SS = 0x10
-export fn _multiboot_entry(multiboot_magic: u32, multiboot_info: *MultibootInfo) callconv(.C) noreturn {
-    const boot32 = @import("boot.zig").boot32;
-
-    if (multiboot_magic == MULTIBOOT_BOOTLOADER_MAGIC)
-        boot32(&multibootEntry, &boot_stack, multiboot_info);
-
-    while (true)
-        asm volatile (
-            \\ cli
-            \\ hlt
-        );
-
-    unreachable;
+export fn _multiboot_entry() callconv(.naked) noreturn {
+    _ = @import("boot.zig");
+    asm volatile (
+        \\  .code32
+        \\      cmpl %[magic], %%eax
+        \\      jne magic_mismatch
+        \\
+        \\      movl $multibootEntry, %%edi  /* Boot function address */
+        \\      movl $boot_stack, %%esi  /* Boot stack address */
+        \\      movl %%ebx, %%edx      /* Multiboot information structure */
+        \\      call boot32
+        \\
+        \\  magic_mismatch:
+        \\      cli
+        \\      hlt
+        :
+        : [magic] "i" (MULTIBOOT_BOOTLOADER_MAGIC),
+    );
 }
 
-fn multibootEntry() callconv(.C) noreturn {
+export fn multibootEntry() noreturn {
     while (true) {}
-}
-comptime {
-    @export(&multibootEntry, .{ .name = "multiboot_entry" });
 }

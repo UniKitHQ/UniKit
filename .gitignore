@@ -5,6 +5,8 @@
 .zig-cache
 zig-out
 
+.gdbinit
+
 *.o
 *.bin
 *.elf
