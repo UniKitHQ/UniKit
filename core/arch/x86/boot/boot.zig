@@ -47,6 +47,6 @@ const gdt64 = [_]SegmentDescriptor{
 /// - Interrupts disabled
 ///
 pub export fn boot32() callconv(.naked) noreturn {
-    cpu.setCR4(.{ .PAE = true });
-    cpu.setMSR(.EFER, .{ .LME = true });
+    (CR4{ .PAE = true }).set();
+    (EFER{ .LME = true }).set();
 }

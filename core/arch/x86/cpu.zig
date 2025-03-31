@@ -142,6 +142,13 @@ pub const CR4 = packed struct(u64) {
     /// User Interrupts Enable Bit (Intel)
     UINTR: bool = false,
     _4: u38 = 0x00,
+
+    pub inline fn set(self: CR4) void {
+        asm volatile ("movq %[i], %%cr4"
+            :
+            : [i] "{rax}" (self),
+        );
+    }
 };
 
 pub const CR8 = packed struct(u64) {
@@ -189,11 +196,16 @@ pub const MSR = enum(u64) {
     SFMASK = 0xC0000084,
     /// Page Attribute Table
     PAT = 0x277,
-};
 
-pub const MSR_TYPE = @import("std").EnumMap(MSR, type).init(.{
-    .EFER = EFER,
-});
+    pub inline fn set(self: MSR, msr: u64) void {
+        asm volatile ("wrmsr"
+            :
+            : [efer] "{ecx}" (self),
+              [i] "{eax}" (@as(u32, @truncate(@as(u64, @bitCast(msr))))),
+              [j] "{edx}" (@as(u32, @truncate(@as(u64, @bitCast(msr)) >> 32))),
+        );
+    }
+};
 
 pub const EFER = packed struct(u64) {
     /// SYSCALL Enable
@@ -224,6 +236,10 @@ pub const EFER = packed struct(u64) {
     AIBRSE: bool = false,
 
     _2: u44 = 0x00,
+
+    pub inline fn set(self: EFER) void {
+        MSR.EFER.set(@as(u64, @bitCast(self)));
+    }
 };
 
 pub const GDTR = packed struct(u80) {
@@ -300,19 +316,3 @@ pub const SegmentDescriptor = packed struct(u64) {
         };
     }
 };
-
-pub inline fn setCR4(value: CR4) void {
-    asm volatile ("movq %[i], %%cr4"
-        :
-        : [i] "{eax}" (value),
-    );
-}
-
-pub inline fn setMSR(comptime msr: MSR, value: (MSR_TYPE.get(msr) orelse u64)) void {
-    asm volatile ("wrmsr"
-        :
-        : [efer] "{ecx}" (msr),
-          [i] "{eax}" (@as(u32, @truncate(@as(u64, @bitCast(value))))),
-          [j] "{edx}" (@as(u32, @truncate(@as(u64, @bitCast(value)) >> 32))),
-    );
-}
