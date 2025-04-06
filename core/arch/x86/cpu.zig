@@ -1,3 +1,10 @@
+// SPDX-License-Identifier: Elastic-2.0
+//
+// Copyright (c) 2024, Pribess (Heewon Cho).
+// Licensed under the Elastic-2.0 License.
+// You may not use this file except in compliance with the License.
+//
+
 pub const RFLAGS = packed struct(u64) {
     /// Carry Flag
     CF: bool = false,
@@ -87,6 +94,13 @@ pub const CR3 = packed union {
         /// Page-Directory base
         PDB: u52 = 0x00,
     },
+
+    pub inline fn set(self: CR3) void {
+        asm volatile ("movq %[i], %%cr3"
+            :
+            : [i] "{rax}" (self),
+        );
+    }
 };
 
 pub const CR4 = packed struct(u64) {
@@ -200,9 +214,9 @@ pub const MSR = enum(u64) {
     pub inline fn set(self: MSR, msr: u64) void {
         asm volatile ("wrmsr"
             :
-            : [efer] "{ecx}" (self),
-              [i] "{eax}" (@as(u32, @truncate(@as(u64, @bitCast(msr))))),
-              [j] "{edx}" (@as(u32, @truncate(@as(u64, @bitCast(msr)) >> 32))),
+            : [_] "{ecx}" (self),
+              [_] "{eax}" (@as(u32, @truncate(msr))),
+              [_] "{edx}" (@as(u32, @truncate(msr >> 32))),
         );
     }
 };
@@ -265,16 +279,16 @@ pub const SegmentDescriptor = packed struct(u64) {
             data = 0,
             code = 1,
         },
-    } = 0x00,
+    } = .{ .a = false, .wr = false, .ec = false, .type = .data },
     /// Descriptor type
     s: enum(u1) {
         system = 0,
         code_data = 1,
-    } = 0x00,
+    } = .system,
     /// Descriptor privilege level
     dpl: u2 = 0x00,
     /// Present
-    p: bool = false,
+    p: bool = true,
     /// High 4 bit of limit value
     limit_high: u4 = 0x00,
     /// Available for use
@@ -286,21 +300,21 @@ pub const SegmentDescriptor = packed struct(u64) {
     db: enum(u1) {
         bit_16 = 0,
         bit_32 = 1,
-    } = 0x00,
+    } = .bit_16,
     /// Granularity (0 = limit, 1 = limit * 4KB)
     g: enum(u1) {
         limit = 0,
         limit_4k = 1,
-    } = 0x00,
+    } = .limit,
     /// High 8 bit of base address
     base_high: u8 = 0x00,
 
     pub fn init(
         comptime limit: u20,
         comptime base: u32,
-        comptime value: SegmentDescriptor,
+        comptime value: ?SegmentDescriptor,
     ) SegmentDescriptor {
-        return .{
+        return if (value) .{
             .limit_low = @truncate(limit),
             .base_low = @truncate(base),
             .type = value.type,
@@ -313,6 +327,6 @@ pub const SegmentDescriptor = packed struct(u64) {
             .db = value.db,
             .g = value.g,
             .base_high = @truncate(base >> 24),
-        };
+        } else @import("std").mem.zeroes(SegmentDescriptor);
     }
 };

@@ -41,20 +41,20 @@ pub const MultibootHeader = extern struct {
     },
 
     /// The above fields plus this one must equal 0 mod 2^32.
-    checksum: u32 = undefined,
+    checksum: u32 = 0x00,
 
     /// These are only valid if MULTIBOOT_AOUT_KLUDGE is set.
-    header_addr: u32 = undefined,
-    load_addr: u32 = undefined,
-    load_end_addr: u32 = undefined,
-    bss_end_addr: u32 = undefined,
-    entry_addr: u32 = undefined,
+    header_addr: u32 = 0x00,
+    load_addr: u32 = 0x00,
+    load_end_addr: u32 = 0x00,
+    bss_end_addr: u32 = 0x00,
+    entry_addr: u32 = 0x00,
 
     /// These are only valid if MULTIBOOT_VIDEO_MODE is set.
-    mode_type: u32 = undefined,
-    width: u32 = undefined,
-    height: u32 = undefined,
-    depth: u32 = undefined,
+    mode_type: u32 = 0x00,
+    width: u32 = 0x00,
+    height: u32 = 0x00,
+    depth: u32 = 0x00,
 
     pub fn init(comptime self: MultibootHeader) MultibootHeader {
         var header = self;
@@ -232,7 +232,7 @@ export const multiboot_header = (MultibootHeader{
     },
 }).init();
 
-export var boot_stack: [4096]u8 linksection(".bss") = undefined;
+export var boot_stack: [4096]u8 = undefined;
 
 /// 32-bit multiboot entry function
 /// EAX = multiboot bootloader magic
