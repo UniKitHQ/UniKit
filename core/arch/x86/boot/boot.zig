@@ -7,6 +7,7 @@
 
 const cpu = @import("x86/cpu.zig");
 const SegmentDescriptor = cpu.SegmentDescriptor;
+const CR0 = cpu.CR0;
 const CR3 = cpu.CR3;
 const CR4 = cpu.CR4;
 const EFER = cpu.EFER;
@@ -101,4 +102,6 @@ pub export fn boot32() callconv(.naked) noreturn {
         \\  movl $bpt, %eax
         \\  movq %rax, %cr3
         ::: "eax", "ebx", "ecx");
+
+    (CR0{ .PE = true, .WP = true, .PG = true }).set();
 }

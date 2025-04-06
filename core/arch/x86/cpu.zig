@@ -74,6 +74,13 @@ pub const CR0 = packed struct(u64) {
     /// Paging
     PG: bool = false,
     _3: u32 = 0x00,
+
+    pub inline fn set(self: CR0) void {
+        asm volatile ("movq %[i], %%cr0"
+            :
+            : [i] "{rax}" (self),
+        );
+    }
 };
 
 pub const CR3 = packed union {
