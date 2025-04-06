@@ -5,7 +5,7 @@
 // You may not use this file except in compliance with the License.
 //
 
-const cpu = @import("x86/cpu.zig");
+const cpu = @import("../cpu.zig");
 const SegmentDescriptor = cpu.SegmentDescriptor;
 const CR0 = cpu.CR0;
 const CR3 = cpu.CR3;
@@ -13,7 +13,7 @@ const CR4 = cpu.CR4;
 const EFER = cpu.EFER;
 const MSR = cpu.MSR;
 
-const paging = @import("x86/paging.zig");
+const paging = @import("../paging.zig");
 const PageTable = paging.PageTable;
 const PML4E = paging.PML4E;
 const PDPTE = paging.PDPTE;
