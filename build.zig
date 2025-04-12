@@ -19,6 +19,7 @@ pub fn build(b: *@import("std").Build) !void {
     });
     unikit.addObject(core);
     unikit.entry = .{ .symbol_name = "_multiboot_entry" };
+    unikit.setLinkerScript(b.path("core/link.x"));
 
     // TODO: Contribute to Zig's objcopy to support output target option
     const elf64_2_32 = b.addSystemCommand(&[_][]const u8{

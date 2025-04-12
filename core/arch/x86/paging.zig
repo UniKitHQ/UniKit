@@ -6,21 +6,21 @@
 //
 
 pub const PageTable = struct {
-    pub fn init(comptime T: type, comptime entries: []const T) [512]T {
+    pub fn init(T: type, entries: []const T) [0x200]T {
         if (T != ReferencePageEntry and T != PDPTE_1GB and T != PDE_2MB and T != PTE_4KB)
             @compileError("The type must be one of the page table entry types");
 
-        if (entries.len > 512)
+        if (entries.len > 0x200)
             @compileError("The number of entries cannot exceed 512");
 
         return @constCast(entries ++ [_]T{.{ .p = false, .address = 0x00 }} ** (0x200 - entries.len)).*;
     }
 
-    pub fn fill(comptime T: type, comptime entry: T, comptime count: usize) [count]T {
+    pub fn fill(T: type, entry: T, count: usize) [count]T {
         if (T != ReferencePageEntry and T != PDPTE_1GB and T != PDE_2MB and T != PTE_4KB)
             @compileError("The type must be one of the page table entry types");
 
-        if (count > 512)
+        if (count > 0x200)
             @compileError("The number of entries cannot exceed 512");
 
         var table = [_]T{entry} ** count;

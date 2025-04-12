@@ -12,6 +12,7 @@ const CR3 = cpu.CR3;
 const CR4 = cpu.CR4;
 const EFER = cpu.EFER;
 const MSR = cpu.MSR;
+const GDTR = cpu.GDTR;
 
 const paging = @import("../paging.zig");
 const PageTable = paging.PageTable;
@@ -22,9 +23,9 @@ const PDE = paging.PDE;
 const PDE_2MB = paging.PDE_2MB;
 const PTE_4KB = paging.PTE_4KB;
 
-export const bpt align(0x200) = (extern struct {
-    pml4: [512]PML4E,
-    pdpte: [512]PDPTE_1GB,
+export const bpt align(0x1000) = (extern struct {
+    pml4: [0x200]PML4E,
+    pdpte: [0x200]PDPTE_1GB,
 }){
     .pml4 = PageTable.init(PML4E, &[_]PML4E{
         .{
@@ -40,10 +41,10 @@ export const bpt align(0x200) = (extern struct {
     }, 4)),
 };
 
-const gdt64 = [_]SegmentDescriptor{
+export const gdt64 = [_]SegmentDescriptor{
     SegmentDescriptor.init(0, 0, null),
     SegmentDescriptor.init(0xFFFFF, 0x0000, .{
-        .type = .{ .type = .code, .ec = false, .wr = true, .a = true },
+        .type = .{ .type = .code, .ec = false, .wr = true, .a = false },
         .s = .code_data,
         .dpl = 0,
         .l = false,
@@ -51,7 +52,7 @@ const gdt64 = [_]SegmentDescriptor{
         .g = .limit_4k,
     }),
     SegmentDescriptor.init(0xFFFFF, 0x0000, .{
-        .type = .{ .type = .code, .ec = false, .wr = true, .a = true },
+        .type = .{ .type = .data, .ec = false, .wr = true, .a = true },
         .s = .code_data,
         .dpl = 0,
         .l = true,
@@ -59,6 +60,14 @@ const gdt64 = [_]SegmentDescriptor{
         .g = .limit_4k,
     }),
 };
+
+comptime {
+    asm (
+        \\  gdtr:
+        \\      .word (0x08 * 3) - 1
+        \\      .quad gdt64
+    );
+}
 
 /// 32-bit boot entry function
 /// @param edi      Address of the protocol dependent boot function
@@ -73,35 +82,56 @@ const gdt64 = [_]SegmentDescriptor{
 /// - Interrupts disabled
 ///
 pub export fn boot32() callconv(.naked) noreturn {
-    asm volatile (".code32");
+    // Set up gdt, page table entry address and CR3
+    // Manual initialization required because Zig does not support 32-bit code generation for specific functions
+
+    // gdtr = { .limit = 0x08 * 3 - 1, .base = &gdt64 };
+    asm volatile ("lgdt gdtr");
+
+    // bpt.pml4[0] |= &bpt.pdpte;
+    // cr3 = &bpt;
+    asm volatile (
+        \\  .code32
+        \\  movl $bpt, %eax
+        \\  addl $0x1000, %eax
+        \\  orl %eax, bpt
+        \\
+        \\  movl $bpt, %eax
+        \\  movl %eax, %cr3
+        ::: "eax");
 
     (CR4{ .PAE = true }).set();
     (EFER{ .LME = true }).set();
-
-    // Set up page table entry address and CR3
-    // Manual initialization required because Zig does not support comptime symbol address resolution
-    // bpt.pml4[0].address = bpt.pdpte;
-    asm volatile (
-        \\  movl $bpt, %eax
-        \\  addl $0x1000, %eax
-        \\
-        \\  movl %eax, %ebx
-        \\  shll $12, %ebx
-        \\
-        \\  movl bpt, %ecx
-        \\  orl %ebx, %ecx
-        \\  movl %ecx, bpt
-        \\
-        \\  movl %eax, %ebx
-        \\  shrl $20, %ebx
-        \\
-        \\  movl bpt + 0x4, %ecx
-        \\  orl %ebx, %ecx
-        \\  movl %ecx, bpt + 0x4
-        \\
-        \\  movl $bpt, %eax
-        \\  movq %rax, %cr3
-        ::: "eax", "ebx", "ecx");
-
     (CR0{ .PE = true, .WP = true, .PG = true }).set();
+
+    asm volatile (
+        \\  .code32
+        \\  ljmp $0x08, $wrap_up
+        \\
+        \\  .code64
+        \\  wrap_up:
+        \\      movl $0x10, %eax
+        \\      movl %eax, %ds
+        \\      movl %eax, %es
+        \\      movl %eax, %ss
+        \\  
+        \\      movl %edi, %esp
+        \\
+        \\      call boot64
+    );
+}
+
+/// 64-bit boot entry function
+/// @param rdi       Address of the protocol dependent boot function
+/// @param rsi       Address of the boot stack
+/// @param rdx       Address of the boot information structure
+///
+/// Assume that
+/// - 64-bit long mode
+/// - Paging enabled with identity mapped paging
+/// - GDT with descriptor for flat CS and DS segments (must have R/E, R/W permissions)
+/// - Interrupts disabled
+///
+pub export fn boot64() noreturn {
+    while (true) {}
 }

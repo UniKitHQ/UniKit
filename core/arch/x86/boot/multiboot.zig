@@ -56,7 +56,7 @@ pub const MultibootHeader = extern struct {
     height: u32 = 0x00,
     depth: u32 = 0x00,
 
-    pub fn init(comptime self: MultibootHeader) MultibootHeader {
+    pub fn init(self: MultibootHeader) MultibootHeader {
         var header = self;
         header.checksum = -%(@as(u32, @bitCast(header.flags)) + MULTIBOOT_HEADER_MAGIC);
         return header;
@@ -224,7 +224,7 @@ pub const MultibootApmInfo = extern struct {
     dseg_len: u16,
 };
 
-export const multiboot_header = (MultibootHeader{
+export const multiboot_header linksection(".data.boot") = (MultibootHeader{
     .magic = MULTIBOOT_HEADER_MAGIC,
     .flags = .{
         .PAGE_ALIGN = true,
@@ -241,23 +241,32 @@ export var boot_stack: [4096]u8 = undefined;
 /// Interrupts are disabled
 /// DS = ES = FS = GS = SS = 0x10
 export fn _multiboot_entry() callconv(.naked) noreturn {
-    _ = @import("boot.zig");
     asm volatile (
         \\  .code32
-        \\      cmpl %[magic], %%eax
-        \\      jne magic_mismatch
         \\
-        \\      movl $multibootEntry, %%edi  /* Boot function address */
-        \\      movl $boot_stack, %%esi  /* Boot stack address */
-        \\      movl %%ebx, %%edx      /* Multiboot information structure */
-        \\      call boot32
+        \\  cmpl %[magic], %%eax
+        \\  jne magic_mismatch
+        \\
+        \\  movl $multibootEntry, %%edi  /* Boot function address */
+        \\  movl $boot_stack, %%esi  /* Boot stack address */
+        \\  movl %%ebx, %%edx      /* Multiboot information structure */
+        \\  jmp boot32
         \\
         \\  magic_mismatch:
-        \\      cli
-        \\      hlt
         :
         : [magic] "i" (MULTIBOOT_BOOTLOADER_MAGIC),
     );
+
+    while (true) asm volatile (
+        \\  cli
+        \\  hlt
+    );
+}
+
+comptime {
+    @export(&_multiboot_entry, .{
+        .name = "_entry",
+    });
 }
 
 export fn multibootEntry() noreturn {

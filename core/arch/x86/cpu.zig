@@ -78,7 +78,7 @@ pub const CR0 = packed struct(u64) {
     pub inline fn set(self: CR0) void {
         asm volatile ("movq %[i], %%cr0"
             :
-            : [i] "{rax}" (self),
+            : [i] "r" (self),
         );
     }
 };
@@ -105,7 +105,7 @@ pub const CR3 = packed union {
     pub inline fn set(self: CR3) void {
         asm volatile ("movq %[i], %%cr3"
             :
-            : [i] "{rax}" (self),
+            : [i] "r" (self),
         );
     }
 };
@@ -167,7 +167,7 @@ pub const CR4 = packed struct(u64) {
     pub inline fn set(self: CR4) void {
         asm volatile ("movq %[i], %%cr4"
             :
-            : [i] "{rax}" (self),
+            : [i] "r" (self),
         );
     }
 };
@@ -266,6 +266,13 @@ pub const EFER = packed struct(u64) {
 pub const GDTR = packed struct(u80) {
     size: u16,
     ptr: u64,
+
+    pub inline fn set(self: GDTR) void {
+        asm volatile ("lgdt %[i]"
+            :
+            : [i] "m" (self),
+        );
+    }
 };
 
 pub const SegmentDescriptor = packed struct(u64) {
@@ -277,9 +284,9 @@ pub const SegmentDescriptor = packed struct(u64) {
     type: packed struct(u4) {
         /// Accessed
         a: bool,
-        /// Writeable / Readable
+        /// Writeable (data) / Readable (code)
         wr: bool,
-        /// Expand down / Conforming
+        /// Expand down (data) / Conforming (code)
         ec: bool,
         /// Type
         type: enum(u1) {
@@ -317,22 +324,21 @@ pub const SegmentDescriptor = packed struct(u64) {
     base_high: u8 = 0x00,
 
     pub fn init(
-        comptime limit: u20,
-        comptime base: u32,
-        comptime value: ?SegmentDescriptor,
+        limit: u20,
+        base: u32,
+        value: ?SegmentDescriptor,
     ) SegmentDescriptor {
-        return if (value) .{
+        return if (value != null) .{
             .limit_low = @truncate(limit),
             .base_low = @truncate(base),
-            .type = value.type,
-            .s = value.s,
-            .dpl = value.dpl,
-            .p = value.p,
+            .type = value.?.type,
+            .s = value.?.s,
+            .dpl = value.?.dpl,
             .limit_high = @truncate(limit >> 16),
-            .avl = value.avl,
-            .l = value.l,
-            .db = value.db,
-            .g = value.g,
+            .avl = value.?.avl,
+            .l = value.?.l,
+            .db = value.?.db,
+            .g = value.?.g,
             .base_high = @truncate(base >> 24),
         } else @import("std").mem.zeroes(SegmentDescriptor);
     }
