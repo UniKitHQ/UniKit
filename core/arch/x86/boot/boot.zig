@@ -104,6 +104,7 @@ pub export fn boot32() callconv(.naked) noreturn {
     (EFER{ .LME = true }).set();
     (CR0{ .PE = true, .WP = true, .PG = true }).set();
 
+    // Set up segmemts
     asm volatile (
         \\  .code32
         \\  ljmp $0x08, $wrap_up
@@ -114,11 +115,12 @@ pub export fn boot32() callconv(.naked) noreturn {
         \\      movl %eax, %ds
         \\      movl %eax, %es
         \\      movl %eax, %ss
-        \\  
-        \\      movl %edi, %esp
-        \\
-        \\      call boot64
     );
+
+    // Set up boot stack
+    asm volatile("movl %edi, %esp");
+
+    asm volatile("call boot64");
 }
 
 /// 64-bit boot entry function
