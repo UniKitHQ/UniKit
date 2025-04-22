@@ -2,8 +2,8 @@ SECTIONS {
     . = 0x100000;
     
     .boot : {
-        KEEP (*(.data.boot))
-        KEEP (*(.data.boot.*))
+        *(.data.boot)
+        *(.data.boot.*)
 
         *(.text.boot)
         *(.text.boot.*)
