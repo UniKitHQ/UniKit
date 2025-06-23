@@ -75,7 +75,36 @@ pub const CR0 = packed struct(u64) {
     PG: bool = false,
     _3: u32 = 0x00,
 
+    pub inline fn get() CR0 {
+        return asm volatile ("movq %%cr0, %[i]"
+            : [i] "=r" (-> CR0),
+        );
+    }
+
     pub inline fn set(self: CR0) void {
+        asm volatile (
+            \\  movq %%cr0, %%rax
+            \\  orq %[i], %%rax
+            \\  movq %%rax, %%cr0
+            :
+            : [i] "r" (self),
+            : "rax"
+        );
+    }
+
+    pub inline fn unset(self: CR0) void {
+        asm volatile (
+            \\  movq %%cr0, %%rax
+            \\  notq %[i]
+            \\  andq %[i], %%rax
+            \\  movq %%rax, %%cr0
+            :
+            : [i] "r" (self),
+            : "rax"
+        );
+    }
+
+    pub inline fn reset(self: CR0) void {
         asm volatile ("movq %[i], %%cr0"
             :
             : [i] "r" (self),
@@ -102,7 +131,7 @@ pub const CR3 = packed union {
         PDB: u52 = 0x00,
     },
 
-    pub inline fn set(self: CR3) void {
+    pub inline fn reset(self: CR3) void {
         asm volatile ("movq %[i], %%cr3"
             :
             : [i] "r" (self),
@@ -164,7 +193,36 @@ pub const CR4 = packed struct(u64) {
     UINTR: bool = false,
     _4: u38 = 0x00,
 
+    pub inline fn get() CR4 {
+        return asm volatile ("movq %%cr4, %[i]"
+            : [i] "=r" (-> CR4),
+        );
+    }
+
     pub inline fn set(self: CR4) void {
+        asm volatile (
+            \\  movq %%cr4, %%rax
+            \\  orq %[i], %%rax
+            \\  movq %%rax, %%cr4
+            :
+            : [i] "r" (self),
+            : "rax"
+        );
+    }
+
+    pub inline fn unset(self: CR0) void {
+        asm volatile (
+            \\  movq %%cr4, %%rax
+            \\  notq %[i]
+            \\  andq %[i], %%rax
+            \\  movq %%rax, %%cr4
+            :
+            : [i] "r" (self),
+            : "rax"
+        );
+    }
+
+    pub inline fn reset(self: CR4) void {
         asm volatile ("movq %[i], %%cr4"
             :
             : [i] "r" (self),
@@ -204,6 +262,26 @@ pub const XCR0 = packed struct(u64) {
     /// If 1, and if XCR0.TILECFG is also 1, Intel AMX instructions can be executed and the XSAVE feature set can be used to manage TILEDATA.
     TILEDATA: bool = false,
     _2: u45 = 0x00,
+
+    pub inline fn get() XCR0 {
+        return asm volatile (
+            \\ xor %rcx, %rcx
+            \\ xgetbv
+            : [_] "={eax}" (-> XCR0),
+            :
+            : "ecx", "edx"
+        );
+    }
+
+    pub inline fn reset(self: XCR0) void {
+        asm volatile (
+            \\ xor %rcx, %rcx
+            \\ xsetbv
+            :
+            : [_] "{eax}" (self),
+            : "ecx", "edx"
+        );
+    }
 };
 
 pub const MSR = enum(u64) {
@@ -218,7 +296,7 @@ pub const MSR = enum(u64) {
     /// Page Attribute Table
     PAT = 0x277,
 
-    pub inline fn set(self: MSR, msr: u64) void {
+    pub inline fn reset(self: MSR, msr: u64) void {
         asm volatile ("wrmsr"
             :
             : [_] "{ecx}" (self),
@@ -258,88 +336,179 @@ pub const EFER = packed struct(u64) {
 
     _2: u44 = 0x00,
 
-    pub inline fn set(self: EFER) void {
-        MSR.EFER.set(@as(u64, @bitCast(self)));
+    pub inline fn reset(self: EFER) void {
+        MSR.EFER.reset(@as(u64, @bitCast(self)));
     }
 };
 
-pub const GDTR = packed struct(u80) {
-    size: u16,
-    ptr: u64,
+pub inline fn CPUID(T: type) CPUID_CTX(T) {
+    var eax: T.EAX = undefined;
+    var ebx: T.EBX = undefined;
+    var ecx: T.ECX = undefined;
+    var edx: T.EDX = undefined;
 
-    pub inline fn set(self: GDTR) void {
-        asm volatile ("lgdt %[i]"
-            :
-            : [i] "m" (self),
-        );
-    }
-};
+    asm volatile ("cpuid"
+        : [_] "={eax}" (eax),
+          [_] "={ebx}" (ebx),
+          [_] "={ecx}" (ecx),
+          [_] "={edx}" (edx),
+        : [_] "{eax}" (T.CODE),
+          [_] "{ecx}" (T.LEAF),
+    );
 
-pub const SegmentDescriptor = packed struct(u64) {
-    /// Low 16 bit of limit value
-    limit_low: u16 = 0x00,
-    /// Low 24 bit of base address
-    base_low: u24 = 0x00,
-    /// Segment type
-    type: packed struct(u4) {
-        /// Accessed
-        a: bool,
-        /// Writeable (data) / Readable (code)
-        wr: bool,
-        /// Expand down (data) / Conforming (code)
-        ec: bool,
-        /// Type
-        type: enum(u1) {
-            data = 0,
-            code = 1,
+    return CPUID_CTX(T){
+        .ctx = .{
+            .eax = eax,
+            .ebx = ebx,
+            .ecx = ecx,
+            .edx = edx,
         },
-    } = .{ .a = false, .wr = false, .ec = false, .type = .data },
-    /// Descriptor type
-    s: enum(u1) {
-        system = 0,
-        code_data = 1,
-    } = .system,
-    /// Descriptor privilege level
-    dpl: u2 = 0x00,
-    /// Present
-    p: bool = true,
-    /// High 4 bit of limit value
-    limit_high: u4 = 0x00,
-    /// Available for use
-    avl: bool = false,
-    /// 64-bit code segment
-    l: bool = false,
-    /// Default operation size (0 = 16-bit, 1 = 32-bit)
-    /// Must be cleared for 64-bit code segments,
-    db: enum(u1) {
-        bit_16 = 0,
-        bit_32 = 1,
-    } = .bit_16,
-    /// Granularity (0 = limit, 1 = limit * 4KB)
-    g: enum(u1) {
-        limit = 0,
-        limit_4k = 1,
-    } = .limit,
-    /// High 8 bit of base address
-    base_high: u8 = 0x00,
+    };
+}
 
-    pub fn init(
-        limit: u20,
-        base: u32,
-        value: ?SegmentDescriptor,
-    ) SegmentDescriptor {
-        return if (value != null) .{
-            .limit_low = @truncate(limit),
-            .base_low = @truncate(base),
-            .type = value.?.type,
-            .s = value.?.s,
-            .dpl = value.?.dpl,
-            .limit_high = @truncate(limit >> 16),
-            .avl = value.?.avl,
-            .l = value.?.l,
-            .db = value.?.db,
-            .g = value.?.g,
-            .base_high = @truncate(base >> 24),
-        } else @import("std").mem.zeroes(SegmentDescriptor);
-    }
+pub fn CPUID_CTX(comptime T: type) type {
+    return struct {
+        ctx: struct {
+            eax: T.EAX,
+            ebx: T.EBX,
+            ecx: T.ECX,
+            edx: T.EDX,
+        },
+
+        inline fn bitTest(a: anytype, b: anytype) bool {
+            return (@as(u32, @bitCast(a)) & @as(u32, @bitCast(b))) != 0;
+        }
+
+        pub inline fn testFlags(
+            self: CPUID_CTX(T),
+            comptime register: enum { eax, ebx, ecx, edx },
+            flag: if (register == .eax) T.EAX else if (register == .ebx) T.EBX else if (register == .ecx) T.ECX else T.EDX,
+        ) bool {
+            return switch (register) {
+                .eax => bitTest(self.ctx.eax, flag),
+                .ebx => bitTest(self.ctx.ebx, flag),
+                .ecx => bitTest(self.ctx.ecx, flag),
+                .edx => bitTest(self.ctx.edx, flag),
+            };
+        }
+    };
+}
+
+pub const CPUID_VERSION_FEATURE = struct {
+    pub const CODE = 0x00000001;
+    pub const LEAF = 0x00000000;
+
+    pub const EAX = u32;
+    pub const EBX = u32;
+    pub const ECX = packed struct(u32) {
+        SSE3: bool = false,
+        PCLMULQDQ: bool = false,
+        DTES64: bool = false,
+        MONITOR: bool = false,
+        DS_CPL: bool = false,
+        VMX: bool = false,
+        SMX: bool = false,
+        EIST: bool = false,
+        TM2: bool = false,
+        SSSE3: bool = false,
+        CNXT_ID: bool = false,
+        SDBG: bool = false,
+        FMA: bool = false,
+        CMPXCHG16B: bool = false,
+        XTPR_UPDATE_CONTROL: bool = false,
+        PDCM: bool = false,
+        _0: u1 = 0x00,
+        PCID: bool = false,
+        DCA: bool = false,
+        SSE4_1: bool = false,
+        SSE4_2: bool = false,
+        X2APIC: bool = false,
+        MOVBE: bool = false,
+        POPCNT: bool = false,
+        TSC_DEADLINE: bool = false,
+        AES: bool = false,
+        XSAVE: bool = false,
+        OSXSAVE: bool = false,
+        AVX: bool = false,
+        F16C: bool = false,
+        RDRAND: bool = false,
+        _1: u1 = 0x00,
+    };
+    pub const EDX = packed struct(u32) {
+        FPU: bool = false,
+        VME: bool = false,
+        DE: bool = false,
+        PSE: bool = false,
+        TSC: bool = false,
+        MSR: bool = false,
+        PAE: bool = false,
+        MCE: bool = false,
+        CX8: bool = false,
+        APIC: bool = false,
+        _0: u1 = 0x00,
+        SEP: bool = false,
+        MTRR: bool = false,
+        PGE: bool = false,
+        MCA: bool = false,
+        CMOV: bool = false,
+        PAT: bool = false,
+        PSE_36: bool = false,
+        PSN: bool = false,
+        CLFSH: bool = false,
+        _1: u1 = 0x00,
+        DS: bool = false,
+        ACPI: bool = false,
+        MMX: bool = false,
+        FXSR: bool = false,
+        SSE: bool = false,
+        SSE2: bool = false,
+        SS: bool = false,
+        HTT: bool = false,
+        TM: bool = false,
+        _2: u1 = 0x00,
+        PBE: bool = false,
+    };
+};
+
+pub const CPUID_EXTENDED_FEATURE = struct {
+    pub const CODE = 0x00000007;
+    pub const LEAF = 0x00000000;
+
+    pub const EAX = u32;
+    pub const EBX = packed struct(u32) {
+        FSGSBASE: bool = false,
+        IA32_TSC_ADJUST: bool = false,
+        SGX: bool = false,
+        BMI1: bool = false,
+        HLE: bool = false,
+        AVX2: bool = false,
+        FDP_EXCPTN_ONLY: bool = false,
+        SMEP: bool = false,
+        BMI2: bool = false,
+        ERMS: bool = false,
+        INVPCID: bool = false,
+        RTM: bool = false,
+        RDT_M: bool = false,
+        IGNORE_FPU_SEGMENT: bool = false,
+        MPX: bool = false,
+        RDT_A: bool = false,
+        AVX512F: bool = false,
+        AVX512DQ: bool = false,
+        RDSEED: bool = false,
+        ADX: bool = false,
+        SMAP: bool = false,
+        AVX512_IFMA: bool = false,
+        _0: u1 = 0x00,
+        CLFLUSHOPT: bool = false,
+        CLWB: bool = false,
+        INTEL_PT: bool = false,
+        AVX512PF: bool = false,
+        AVX512ER: bool = false,
+        AVX512CD: bool = false,
+        SHA: bool = false,
+        AVX512BW: bool = false,
+        AVX512VL: bool = false,
+    };
+    pub const ECX = u32;
+    pub const EDX = u32;
 };

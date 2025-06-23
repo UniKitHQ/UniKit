@@ -6,15 +6,19 @@
 //
 
 const cpu = @import("../cpu.zig");
-const SegmentDescriptor = cpu.SegmentDescriptor;
 const CR0 = cpu.CR0;
 const CR3 = cpu.CR3;
 const CR4 = cpu.CR4;
+// const XCR0 = cpu.XCR0;
 const EFER = cpu.EFER;
-const MSR = cpu.MSR;
-const GDTR = cpu.GDTR;
+// const MSR = cpu.MSR;
+// const CPUID = cpu.CPUID;
+// const CPUID_VERSION_FEATURE = cpu.CPUID_VERSION_FEATURE;
+// const CPUID_EXTENDED_FEATURE = cpu.CPUID_EXTENDED_FEATURE;
 
-const paging = @import("../paging.zig");
+const SSE = @import("../extension/sse.zig");
+
+const paging = @import("../memory/paging.zig");
 const PageTable = paging.PageTable;
 const PML4E = paging.PML4E;
 const PDPTE = paging.PDPTE;
@@ -27,38 +31,28 @@ export const bpt align(0x1000) = (extern struct {
     pml4: [0x200]PML4E,
     pdpte: [0x200]PDPTE_1GB,
 }){
-    .pml4 = PageTable.init(PML4E, &[_]PML4E{
+    .pml4 = PageTable.create(PML4E, &[_]PML4E{
         .{
             .p = true,
             .rw = .writeable,
             .address = 0x00,
         },
     }),
-    .pdpte = PageTable.init(PDPTE_1GB, &PageTable.fill(PDPTE_1GB, .{
+    .pdpte = PageTable.create(PDPTE_1GB, &PageTable.fill(PDPTE_1GB, .{
         .p = true,
         .rw = .writeable,
         .address = 0x00,
     }, 4)),
 };
 
+const gdt = @import("../memory/gdt.zig");
+const GDTR = gdt.GDTR;
+const SegmentDescriptor = gdt.SegmentDescriptor;
+const SegmentSelector = gdt.SegmentSelector;
 export const gdt64 = [_]SegmentDescriptor{
-    SegmentDescriptor.init(0, 0, null),
-    SegmentDescriptor.init(0xFFFFF, 0x0000, .{
-        .type = .{ .type = .code, .ec = false, .wr = true, .a = false },
-        .s = .code_data,
-        .dpl = 0,
-        .l = true,
-        .db = .bit_16,
-        .g = .limit_4k,
-    }),
-    SegmentDescriptor.init(0xFFFFF, 0x0000, .{
-        .type = .{ .type = .data, .ec = false, .wr = true, .a = true },
-        .s = .code_data,
-        .dpl = 0,
-        .l = false,
-        .db = .bit_32,
-        .g = .limit_4k,
-    }),
+    SegmentDescriptor.NULL,
+    SegmentDescriptor.createCodeSegment(.{ .dpl = 0 }),
+    SegmentDescriptor.createDataSegment(.{ .dpl = 0 }),
 };
 
 comptime {
@@ -71,8 +65,7 @@ comptime {
 
 /// 32-bit boot entry function
 /// @param edi      Address of the protocol dependent boot function
-/// @param esi      Address of the boot stack
-/// @param edx      Address of the boot information structure
+/// @param esi      Address of the boot information structure
 ///
 /// Assume that:
 /// - 32-bit protected mode
@@ -81,14 +74,13 @@ comptime {
 /// - GDT with descriptor for 4GB flat CS and DS segments (must have R/E, R/W permissions)
 /// - Interrupts disabled
 ///
-pub export fn boot32() callconv(.naked) noreturn {
-    // Set up gdt, page table entry address and CR3
-    // Manual initialization required because Zig does not support 32-bit code generation for specific functions
+export fn boot32() callconv(.naked) noreturn {
+    // Only inline assembly and comptime inline function calls are permitted
+    // Any other operations result in undefined behavior
 
-    // gdtr = { .limit = 0x08 * 3 - 1, .base = &gdt64 };
-    asm volatile ("lgdt gdtr");
+    // Set up page table entry address, CR3 and GDT
 
-    // bpt.pml4[0] |= &bpt.pdpte;
+    // bpt.pml4[0] |= &bpt.pdpte; (&bpt.pdpte == &bpt + 0x1000)
     // cr3 = &bpt;
     asm volatile (
         \\  .code32
@@ -100,33 +92,28 @@ pub export fn boot32() callconv(.naked) noreturn {
         \\  movl %eax, %cr3
         ::: "eax");
 
-    (CR4{ .PAE = true }).set();
-    (EFER{ .LME = true }).set();
-    (CR0{ .PE = true, .WP = true, .PG = true }).set();
+    // Uses reset() only for 32-bit code
+    (CR4{ .PAE = true }).reset();
+    (EFER{ .LME = true }).reset();
+    (CR0{
+        .PE = true,
+        .WP = true,
+        .PG = true,
+    }).reset();
 
-    // Set up segmemts
-    asm volatile (
-        \\  .code32
-        \\  ljmp $0x08, $wrap_up
-        \\
-        \\  .code64
-        \\  wrap_up:
-        \\      movl $0x10, %eax
-        \\      movl %eax, %ds
-        \\      movl %eax, %es
-        \\      movl %eax, %ss
-    );
+    GDTR.set32(&gdt64);
 
-    // Set up boot stack
-    asm volatile("movl %edi, %esp");
+    SegmentSelector.CS.set(.{ .index = 0x01 });
+    SegmentSelector.DS.set(.{ .index = 0x02 });
+    SegmentSelector.SS.set(.{ .index = 0x02 });
+    SegmentSelector.ES.set(.{ .index = 0x02 });
 
-    asm volatile("call boot64");
+    asm volatile ("call boot64");
 }
 
 /// 64-bit boot entry function
 /// @param rdi       Address of the protocol dependent boot function
-/// @param rsi       Address of the boot stack
-/// @param rdx       Address of the boot information structure
+/// @param rsi       Address of the boot information structure
 ///
 /// Assume that
 /// - 64-bit long mode
@@ -134,6 +121,46 @@ pub export fn boot32() callconv(.naked) noreturn {
 /// - GDT with descriptor for flat CS and DS segments (must have R/E, R/W permissions)
 /// - Interrupts disabled
 ///
-pub export fn boot64() noreturn {
-    while (true) {}
+export fn boot64() noreturn {
+    asm volatile (
+        \\  push %rdi
+        \\  push %rsi
+    );
+
+    SSE.enable();
+
+    // const ctx = CPUID(CPUID_VERSION_FEATURE);
+
+    // if (ctx.testFlags(.ecx, .{ .XSAVE = true })) {
+    //     var cr4 = CR4.get();
+    //     cr4.OSXSAVE = true;
+    //     cr4.reset();
+
+    //     if (ctx.testFlags(.ecx, .{ .AVX = true })) {
+    //         var xcr0 = XCR0.get();
+
+    //         xcr0.X87 = true;
+    //         xcr0.SSE = true;
+    //         xcr0.AVX = true;
+
+    //         if (CPUID(CPUID_EXTENDED_FEATURE).testFlags(.ebx, .{ .AVX512F = true })) {
+    //             xcr0.OPMASK = true;
+    //             xcr0.ZMM_HI256 = true;
+    //             xcr0.HI16_ZMM = true;
+    //         }
+
+    //         xcr0.reset();
+    //     }
+    // }
+
+    asm volatile (
+        \\  pop %rsi
+        \\  pop %rdi
+        \\  call *%rdi
+    );
+
+    while (true) asm volatile (
+        \\  cli
+        \\  hlt
+    );
 }

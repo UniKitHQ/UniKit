@@ -6,7 +6,7 @@
 //
 
 pub const PageTable = struct {
-    pub fn init(T: type, entries: []const T) [0x200]T {
+    pub fn create(T: type, entries: []const T) [0x200]T {
         if (T != ReferencePageEntry and T != PDPTE_1GB and T != PDE_2MB and T != PTE_4KB)
             @compileError("The type must be one of the page table entry types");
 

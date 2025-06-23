@@ -247,9 +247,10 @@ export fn _multiboot_entry() callconv(.naked) noreturn {
         \\  cmpl %[magic], %%eax
         \\  jne magic_mismatch
         \\
+        \\  movl %edx, %esp /* Set up boot stack */
+        \\
         \\  movl $multibootEntry, %%edi  /* Boot function address */
-        \\  movl $boot_stack, %%esi  /* Boot stack address */
-        \\  movl %%ebx, %%edx      /* Multiboot information structure */
+        \\  movl %%ebx, %%esi      /* Multiboot information structure */
         \\  jmp boot32
         \\
         \\  magic_mismatch:
