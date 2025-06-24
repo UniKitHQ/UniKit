@@ -49,19 +49,12 @@ const gdt = @import("../memory/gdt.zig");
 const GDTR = gdt.GDTR;
 const SegmentDescriptor = gdt.SegmentDescriptor;
 const SegmentSelector = gdt.SegmentSelector;
+
 export const gdt64 = [_]SegmentDescriptor{
     SegmentDescriptor.NULL,
     SegmentDescriptor.createCodeSegment(.{ .dpl = 0 }),
     SegmentDescriptor.createDataSegment(.{ .dpl = 0 }),
 };
-
-comptime {
-    asm (
-        \\  gdtr:
-        \\      .word (0x08 * 3) - 1
-        \\      .quad gdt64
-    );
-}
 
 /// 32-bit boot entry function
 /// @param edi      Address of the protocol dependent boot function
