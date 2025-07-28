@@ -25,42 +25,22 @@ pub const SegmentSelector = packed struct(u16) {
         }
     };
 
-    pub inline fn set(self: SegmentSelector, comptime register: []const u8) void {
-        asm volatile ("mov %[i], %%" ++ register
-            :
-            : [i] "r" (self),
-        );
+    inline fn Selector(comptime register: []const u8) type {
+        return struct {
+            pub inline fn set(self: SegmentSelector) void {
+                asm volatile ("mov %[i], %%" ++ register
+                    :
+                    : [i] "r" (self),
+                );
+            }
+        };
     }
 
-    pub const DS = struct {
-        pub inline fn set(self: SegmentSelector) void {
-            self.set("ds");
-        }
-    };
-
-    pub const SS = struct {
-        pub inline fn set(self: SegmentSelector) void {
-            self.set("ss");
-        }
-    };
-
-    pub const ES = struct {
-        pub inline fn set(self: SegmentSelector) void {
-            self.set("es");
-        }
-    };
-
-    pub const FS = struct {
-        pub inline fn set(self: SegmentSelector) void {
-            self.set("fs");
-        }
-    };
-
-    pub const GS = struct {
-        pub inline fn set(self: SegmentSelector) void {
-            self.set("gs");
-        }
-    };
+    pub const DS = Selector("ds");
+    pub const SS = Selector("ss");
+    pub const ES = Selector("es");
+    pub const FS = Selector("fs");
+    pub const GS = Selector("gs");
 };
 
 pub const GDTR = packed struct(u80) {
