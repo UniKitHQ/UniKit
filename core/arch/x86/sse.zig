@@ -5,8 +5,8 @@
 // You may not use this file except in compliance with the License.
 //
 
-const CR0 = @import("../cpu.zig").CR0;
-const CR4 = @import("../cpu.zig").CR4;
+const CR0 = @import("cpu.zig").CR0;
+const CR4 = @import("cpu.zig").CR4;
 
 pub fn enable() void {
     (CR0{

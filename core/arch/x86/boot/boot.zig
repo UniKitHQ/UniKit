@@ -16,7 +16,7 @@ const EFER = cpu.EFER;
 // const CPUID_VERSION_FEATURE = cpu.CPUID_VERSION_FEATURE;
 // const CPUID_EXTENDED_FEATURE = cpu.CPUID_EXTENDED_FEATURE;
 
-const SSE = @import("../extension/sse.zig");
+const SSE = @import("../sse.zig");
 
 const paging = @import("../memory/paging.zig");
 const PageTable = paging.PageTable;
