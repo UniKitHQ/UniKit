@@ -43,14 +43,32 @@ pub const SegmentSelector = packed struct(u16) {
     pub const GS = Selector("gs");
 };
 
+pub fn load(table: []const SegmentDescriptor) void {
+    GDTR.create(table).set();
+}
+
+pub inline fn load32(table: []const SegmentDescriptor) void {
+    asm volatile (
+        \\  .code32
+        \\  pushl $0x00
+        \\  pushl %[j]
+        \\  pushw %[i]
+        \\  lgdt (%esp)
+        \\  addl $0x0C, %esp
+        :
+        : [i] "{eax}" (@as(u16, @truncate((table.len * 0x08) - 1))),
+          [j] "{ebx}" (@as(u32, @truncate(@intFromPtr(table.ptr)))),
+    );
+}
+
 pub const GDTR = packed struct(u80) {
     size: u16,
     ptr: u64,
 
-    pub inline fn create(gdt: GDT) GDTR {
+    pub inline fn create(table: []const SegmentDescriptor) GDTR {
         return .{
-            .size = @truncate(gdt.len - 1),
-            .ptr = @intFromPtr(gdt.ptr),
+            .size = @truncate(table.len - 1),
+            .ptr = @intFromPtr(table.ptr),
         };
     }
 
@@ -60,23 +78,7 @@ pub const GDTR = packed struct(u80) {
             : [i] "m" (self),
         );
     }
-
-    pub inline fn set32(gdt: GDT) void {
-        asm volatile (
-            \\  .code32
-            \\  pushl $0x00
-            \\  pushl %[j]
-            \\  pushw %[i]
-            \\  lgdt (%esp)
-            \\  addl $0x0C, %esp
-            :
-            : [i] "{eax}" (@as(u16, @truncate((gdt.len * 0x08) - 1))),
-              [j] "{ebx}" (@as(u32, @truncate(@intFromPtr(gdt.ptr)))),
-        );
-    }
 };
-
-pub const GDT = []const SegmentDescriptor;
 
 pub const SegmentAccessByte = packed struct(u8) {
     pub const SegmentType = enum(u1) {

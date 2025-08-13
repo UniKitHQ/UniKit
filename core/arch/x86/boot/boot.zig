@@ -45,10 +45,10 @@ export const bpt align(0x1000) = (extern struct {
     }, 4)),
 };
 
-const gdt = @import("../memory/gdt.zig");
-const GDTR = gdt.GDTR;
-const SegmentDescriptor = gdt.SegmentDescriptor;
-const SegmentSelector = gdt.SegmentSelector;
+const GDT = @import("../memory/gdt.zig");
+const GDTR = GDT.GDTR;
+const SegmentDescriptor = GDT.SegmentDescriptor;
+const SegmentSelector = GDT.SegmentSelector;
 
 export const gdt64 = [_]SegmentDescriptor{
     SegmentDescriptor.NULL,
@@ -94,7 +94,7 @@ export fn boot32() callconv(.naked) noreturn {
         .PG = true,
     }).reset();
 
-    GDTR.set32(&gdt64);
+    GDT.load32(&gdt64);
 
     SegmentSelector.CS.set(.{ .index = 0x01 });
     SegmentSelector.DS.set(.{ .index = 0x02 });
