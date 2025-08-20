@@ -210,7 +210,7 @@ pub const CR4 = packed struct(u64) {
         );
     }
 
-    pub inline fn unset(self: CR0) void {
+    pub inline fn unset(self: CR4) void {
         asm volatile (
             \\  movq %%cr4, %%rax
             \\  notq %[i]
