@@ -1,51 +1,48 @@
-pub fn build(b: *@import("std").Build) !void {
-    const core = b.addObject(.{
-        .name = "core",
-        .root_module = b.addModule("core", .{
-            .root_source_file = b.path("core/main.zig"),
-            .target = b.resolveTargetQuery(.{
-                .cpu_arch = .x86_64,
-                .os_tag = .freestanding,
-            }),
-        }),
+const std = @import("std");
+
+const core = @import("core/build.zig");
+
+const config = @import("config.zig");
+
+pub fn build(b: *std.Build) !void {
+    // const simd_feature_set = std.Target.x86.featureSet(&[_]std.Target.x86.Feature{
+    //     .sse,
+    //     .sse_unaligned_mem,
+    //     .sse2,
+    //     .sse3,
+    //     .sse4_1,
+    //     .sse4_2,
+    //     .sse4a,
+    //     .ssse3,
+    //     .avx,
+    //     .avx2,
+    //     .avx512bf16,
+    //     .avx512bitalg,
+    //     .avx512bw,
+    //     .avx512cd,
+    //     .avx512dq,
+    //     .avx512er,
+    //     .avx512f,
+    //     .avx512ifma,
+    //     .avx512pf,
+    //     .avx512vbmi,
+    //     .avx512vbmi2,
+    //     .avx512vl,
+    //     .avx512vnni,
+    //     .avx512vp2intersect,
+    //     .avx512vpopcntdq,
+    // });
+
+    const target = b.resolveTargetQuery(.{
+        .cpu_arch = .x86_64,
+        .os_tag = .freestanding,
+        .abi = .none,
+
+        // .cpu_features_add = std.Target.x86.featureSet(&[_]std.Target.x86.Feature{.soft_float}),
+        // .cpu_features_sub = simd_feature_set,
     });
 
-    const unikit = b.addExecutable(.{
-        .name = "unikit",
-        .target = b.resolveTargetQuery(.{
-            .cpu_arch = .x86_64,
-            .os_tag = .freestanding,
-        }),
-    });
-    unikit.addObject(core);
-    unikit.entry = .{ .symbol_name = "_multiboot_entry" };
-    unikit.setLinkerScript(b.path("core/link.x"));
+    const configs = config.x86_64{};
 
-    // TODO: Contribute to Zig's objcopy to support output target option
-    const elf64_2_32 = b.addSystemCommand(&[_][]const u8{
-        "llvm-objcopy",
-        "--output-target=elf32-i386",
-        b.getInstallPath(.bin, unikit.out_filename),
-        b.getInstallPath(.bin, unikit.out_filename),
-    });
-    elf64_2_32.step.dependOn(&b.addInstallArtifact(unikit, .{
-        .dest_dir = .default,
-        .dest_sub_path = unikit.out_filename,
-    }).step);
-
-    b.getInstallStep().dependOn(&elf64_2_32.step);
-
-    const debug = b.option(bool, "debug", "Enable debug flag for qemu") orelse false;
-    const qemu = b.addSystemCommand(&([_][]const u8{
-        "qemu-system-x86_64",
-        "-nographic",
-        "-kernel",
-        b.getInstallPath(.bin, unikit.out_filename),
-        "-initrd",
-        b.getInstallPath(.bin, unikit.out_filename),
-        if (debug) "-s" else "",
-        if (debug) "-S" else "",
-    }));
-    qemu.step.dependOn(&elf64_2_32.step);
-    b.step("run", "Run the kernel").dependOn(&qemu.step);
+    try core.build(b, target, configs.get(b));
 }

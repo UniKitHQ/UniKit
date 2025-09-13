@@ -17,7 +17,7 @@ const EFER = cpu.EFER;
 // const CPUID_EXTENDED_FEATURE = cpu.CPUID_EXTENDED_FEATURE;
 
 const SSE = @import("../sse.zig");
-
+const AVX = @import("../avx.zig");
 const paging = @import("../memory/paging.zig");
 const PageTable = paging.PageTable;
 const PML4E = paging.PML4E;
@@ -121,30 +121,7 @@ export fn boot64() noreturn {
     );
 
     SSE.enable();
-
-    // const ctx = CPUID(CPUID_VERSION_FEATURE);
-
-    // if (ctx.testFlags(.ecx, .{ .XSAVE = true })) {
-    //     var cr4 = CR4.get();
-    //     cr4.OSXSAVE = true;
-    //     cr4.reset();
-
-    //     if (ctx.testFlags(.ecx, .{ .AVX = true })) {
-    //         var xcr0 = XCR0.get();
-
-    //         xcr0.X87 = true;
-    //         xcr0.SSE = true;
-    //         xcr0.AVX = true;
-
-    //         if (CPUID(CPUID_EXTENDED_FEATURE).testFlags(.ebx, .{ .AVX512F = true })) {
-    //             xcr0.OPMASK = true;
-    //             xcr0.ZMM_HI256 = true;
-    //             xcr0.HI16_ZMM = true;
-    //         }
-
-    //         xcr0.reset();
-    //     }
-    // }
+    AVX.enable();
 
     asm volatile (
         \\  pop %rsi
