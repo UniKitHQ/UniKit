@@ -19,7 +19,7 @@ pub fn enable() void {
         const ctx = CPUID(CPUID_VERSION_FEATURE);
 
         if (ctx.testFlags(.ecx, .{ .AVX = true })) {
-            var xcr0 = XCR0.get();
+            var xcr0 = XCR0{};
 
             xcr0.AVX = true;
 
@@ -29,7 +29,7 @@ pub fn enable() void {
                 xcr0.HI16_ZMM = true;
             }
 
-            xcr0.reset();
+            xcr0.set();
         }
     }
 }

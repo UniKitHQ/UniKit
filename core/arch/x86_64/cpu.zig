@@ -92,7 +92,7 @@ pub const CR0 = packed struct(u64) {
         );
     }
 
-    pub inline fn unset(self: CR0) void {
+    pub inline fn clear(self: CR0) void {
         asm volatile (
             \\  movq %%cr0, %%rax
             \\  notq %[i]
@@ -210,7 +210,7 @@ pub const CR4 = packed struct(u64) {
         );
     }
 
-    pub inline fn unset(self: CR4) void {
+    pub inline fn clear(self: CR4) void {
         asm volatile (
             \\  movq %%cr4, %%rax
             \\  notq %[i]
@@ -269,7 +269,19 @@ pub const XCR0 = packed struct(u64) {
             \\ xgetbv
             : [_] "={eax}" (-> XCR0),
             :
-            : "ecx", "edx"
+            : "rcx", "rdx"
+        );
+    }
+
+    pub inline fn set(self: XCR0) void {
+        asm volatile (
+            \\ xor %rcx, %rcx
+            \\ xgetbv
+            \\ orq %[i], %%rax
+            \\ xsetbv
+            :
+            : [i] "r" (self),
+            : "rcx", "rdx", "rax"
         );
     }
 
@@ -278,8 +290,8 @@ pub const XCR0 = packed struct(u64) {
             \\ xor %rcx, %rcx
             \\ xsetbv
             :
-            : [_] "{eax}" (self),
-            : "ecx", "edx"
+            : [_] "{rax}" (self),
+            : "rcx", "rdx"
         );
     }
 };

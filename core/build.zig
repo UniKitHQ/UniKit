@@ -38,6 +38,8 @@ pub fn build(b: *std.Build, target: std.Build.ResolvedTarget, config: *std.Build
     const qemu = b.addSystemCommand(&([_][]const u8{
         "qemu-system-x86_64",
         "-nographic",
+        "-cpu",
+        "Haswell,+xsave",
         "-kernel",
         b.getInstallPath(.bin, unikit.out_filename),
         "-initrd",
