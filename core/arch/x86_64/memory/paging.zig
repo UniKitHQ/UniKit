@@ -31,7 +31,7 @@ pub const PageTable = struct {
     }
 };
 
-pub const PML4E = TableEntry;
+pub const PML4E = TableEntry(PDPTE_1GB);
 
 pub const PDPTE_1GB = packed struct(u64) {
     /// Present
@@ -152,74 +152,94 @@ pub const PTE_4KB = packed struct(u64) {
     xd: bool = false,
 };
 
+fn PagingLevel(comptime T: type) type {
+    return struct {
+        pub const Entry = T;
+
+        entries: [512]Entry align(0x1000),
+
+        pub fn createLinear(frame: u64, count: usize) @This() {
+            @setEvalBranchQuota(2000);
+
+            if (count > 512) @compileError("number of entries cannot exceed 512");
+
+            var entries = [_]Entry{undefined} ** count;
+            for (&entries, frame..) |*r, i| {
+                r.* = Entry.create(i, .{});
+            }
+
+            return .{
+                .entries = entries ++ ([_]Entry{.{ .p = false, .address = 0x00 }} ** (512 - count)),
+            };
+        }
+
+        pub fn create(frame: u64) @This() {
+            return createLinear(frame, 512);
+        }
+    };
+}
+
 pub const Page = struct {
-    pub const Table = struct {
-        pub const Entry = PageEntry;
-    };
+    pub const Table = PagingLevel(PageEntry);
 
-    pub const Directory = struct {
-        pub const Entry = packed union {
-            table: TableEntry,
-            page: HugePageEntry(21),
-        };
-    };
+    pub const Directory = PagingLevel(packed union {
+        table: TableEntry(Table),
+        page: HugePageEntry(21),
+    });
 
-    pub const DirectoryPointer = struct {
-        pub const Entry = packed union {
-            table: TableEntry,
-            page: HugePageEntry(30),
-        };
-    };
+    pub const DirectoryPointer = PagingLevel(packed union {
+        table: TableEntry(Directory),
+        page: HugePageEntry(30),
+    });
 
-    pub const MapLevel4 = struct {
-        pub const Entry = TableEntry;
-    };
+    pub const MapLevel4 = PagingLevel(TableEntry(DirectoryPointer));
 
-    pub const MapLevel5 = struct {
-        pub const Entry = TableEntry;
-    };
+    pub const MapLevel5 = PagingLevel(TableEntry(MapLevel4));
 };
 
-const TableEntry = packed struct(u64) {
-    /// Present
-    p: bool = true,
-    /// Read/Write
-    rw: enum(u1) {
-        readonly = 0,
-        writeable = 1,
-    } = .readonly,
-    /// User/Supervisor
-    us: enum(u1) {
-        supervisor = 0,
-        user = 1,
-    } = .supervisor,
-    /// Page-level write-through
-    pwt: bool = false,
-    /// Page-level cache disable
-    pcd: bool = false,
-    /// Accessed
-    a: bool = false,
-    _0: u1 = 0x00,
-    /// Page Size
-    ps: bool = false,
-    _1: u3 = 0x00,
-    /// HLAT Ignore
-    r: bool = false,
-    /// Table Address
-    address: u40,
-    _2: u11 = 0x00,
-    /// Execute Disable
-    xd: bool = false,
+fn TableEntry(comptime T: type) type {
+    return packed struct(u64) {
+        /// Present
+        p: bool = true,
+        /// Read/Write
+        rw: enum(u1) {
+            readonly = 0,
+            writeable = 1,
+        } = .readonly,
+        /// User/Supervisor
+        us: enum(u1) {
+            supervisor = 0,
+            user = 1,
+        } = .supervisor,
+        /// Page-level write-through
+        pwt: bool = false,
+        /// Page-level cache disable
+        pcd: bool = false,
+        /// Accessed
+        a: bool = false,
+        _0: u1 = 0x00,
+        /// Page Size
+        ps: bool = false,
+        _1: u3 = 0x00,
+        /// HLAT Ignore
+        r: bool = false,
+        /// Table Address
+        address: u40 = 0x00,
+        _2: u11 = 0x00,
+        /// Execute Disable
+        xd: bool = false,
 
-    pub fn create(address: u64, entry: @This()) @This() {
-        entry.address = address >> 12;
-        return entry;
-    }
+        pub fn create(address: u64, options: @This()) @This() {
+            var entry = options;
+            entry.address = address >> 12;
+            return entry;
+        }
 
-    pub fn getAddress(self: @This()) u64 {
-        return self.address << 12;
-    }
-};
+        pub fn getTable(self: @This()) *T {
+            return @ptrFromInt(self.address << 12);
+        }
+    };
+}
 
 const PageEntry = packed struct(u64) {
     /// Present
@@ -250,14 +270,15 @@ const PageEntry = packed struct(u64) {
     /// HLAT Ignore
     r: bool = false,
     /// Page Frame Address
-    address: u40,
+    address: u40 = 0x00,
     _1: u7 = 0x00,
     /// Protection Key
     pk: u4 = 0x00,
     /// Execute Disable
     xd: bool = false,
 
-    pub fn create(frame: u64, entry: @This()) @This() {
+    pub fn create(frame: u64, options: PageEntry) PageEntry {
+        var entry = options;
         entry.address = frame << 12;
         return entry;
     }
@@ -298,14 +319,15 @@ fn HugePageEntry(comptime size: u64) type {
         r: bool = false,
         /// Page Attribute Table
         pat: bool = false,
-        address: u39,
+        address: u39 = 0x00,
         _1: u7 = 0x00,
         /// Protection Key
         pk: u4 = 0x00,
         /// Execute Disable
         xd: bool = false,
 
-        pub fn create(frame: u64, entry: @This()) @This() {
+        pub fn create(frame: u64, options: @This()) @This() {
+            var entry = options;
             entry.address = frame << size;
             return entry;
         }

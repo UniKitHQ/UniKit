@@ -27,22 +27,30 @@ const PDE = paging.PDE;
 const PDE_2MB = paging.PDE_2MB;
 const PTE_4KB = paging.PTE_4KB;
 
-export const bpt align(0x1000) = (extern struct {
-    pml4: [0x200]PML4E,
-    pdpte: [0x200]PDPTE_1GB,
-}){
-    .pml4 = PageTable.create(PML4E, &[_]PML4E{
-        .{
-            .p = true,
-            .rw = .writeable,
-            .address = 0x00,
-        },
-    }),
-    .pdpte = PageTable.create(PDPTE_1GB, &PageTable.fill(PDPTE_1GB, .{
-        .p = true,
-        .rw = .writeable,
-        .address = 0x00,
-    }, 4)),
+// export const bpt align(0x1000) = (extern struct {
+//     pml4: [0x200]PML4E,
+//     pdpte: [0x200]PDPTE_1GB,
+// }){
+//     .pml4 = PageTable.create(PML4E, &[_]PML4E{
+//         .{
+//             .p = true,
+//             .rw = .writeable,
+//             .address = 0x00,
+//         },
+//     }),
+//     .pdpte = PageTable.create(PDPTE_1GB, &PageTable.fill(PDPTE_1GB, .{
+//         .p = true,
+//         .rw = .writeable,
+//         .address = 0x00,
+//     }, 4)),
+// };
+
+const Page = paging.Page;
+
+export const bpt_new = .{
+    .pml4 = Page.Table.create(
+        0x00,
+    ),
 };
 
 const GDT = @import("../memory/gdt.zig");
