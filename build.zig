@@ -42,7 +42,7 @@ pub fn build(b: *std.Build) !void {
         // .cpu_features_sub = simd_feature_set,
     });
 
-    const configs = config.x86_64{};
+    var configs = config.x86_64{};
 
     try core.build(b, target, configs.get(b));
 }

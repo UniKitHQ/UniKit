@@ -27,22 +27,22 @@ const PDE = paging.PDE;
 const PDE_2MB = paging.PDE_2MB;
 const PTE_4KB = paging.PTE_4KB;
 
+const Page = paging.Page;
+
 export const bpt align(0x1000) = (extern struct {
-    pml4: [0x200]PML4E,
-    pdpte: [0x200]PDPTE_1GB,
+    pml4: Page.MapLevel4,
+    pdpte: Page.DirectoryPointer,
 }){
-    .pml4 = PageTable.create(PML4E, &[_]PML4E{
-        .{
-            .p = true,
-            .rw = .writeable,
-            .address = 0x00,
-        },
-    }),
-    .pdpte = PageTable.create(PDPTE_1GB, &PageTable.fill(PDPTE_1GB, .{
-        .p = true,
-        .rw = .writeable,
-        .address = 0x00,
-    }, 4)),
+    .pml4 = Page.MapLevel4.createPartial(
+        0x00,
+        1,
+        .{ .rw = .writeable },
+    ),
+    .pdpte = Page.DirectoryPointer.createPartial(
+        0x00,
+        4,
+        .{ .page = .{ .rw = .writeable } },
+    ),
 };
 
 const GDT = @import("../memory/gdt.zig");
