@@ -98,8 +98,12 @@ fn TableEntry(comptime T: type) type {
             return entry;
         }
 
-        pub fn getTable(self: @This()) *T {
+        pub fn get(self: @This()) *T {
             return @ptrFromInt(self.address << 12);
+        }
+
+        pub fn insert(self: @This(), table: *T) void {
+            self.address = @intFromPtr(table) >> 12;
         }
     };
 }
@@ -146,7 +150,7 @@ const PageEntry = packed struct(u64) {
         return entry;
     }
 
-    pub fn getFrame(self: @This()) u64 {
+    pub fn get(self: @This()) u64 {
         return self.address >> 12;
     }
 };
@@ -195,7 +199,7 @@ fn HugePageEntry(comptime size: u64) type {
             return entry;
         }
 
-        pub fn getFrame(self: @This()) u64 {
+        pub fn get(self: @This()) u64 {
             return self.address >> size;
         }
     };
